@@ -39,5 +39,8 @@
     "prettier": "^3.6.2",
     "semantic-release": "^24.2.8",
     "turbo": "^2.5.6"
+  },
+  "dependencies": {
+    "eslint-plugin-vue-modular": "^1.19.2"
   }
 }

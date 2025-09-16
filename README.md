@@ -40,6 +40,14 @@ make build
 make dev
 ```
 
+## Modular Vue Architecture
+
+This project uses a modular architecture for Vue components, allowing for better organization and reusability of code. Each module can contain its own components, state management, and routes.
+
+To support this feature-oriented architecture, we have integrated the [`eslint-plugin-vue-modular`](https://www.npmjs.com/package/eslint-plugin-vue-modular) plugin into our ESLint configuration. This plugin enforces best practices and maintains consistency across the modular structure of Vue components.
+
+Our repository serves as a platform for testing and developing this plugin and its related configurations. We welcome contributions and feedback from the community to help improve both the plugin and its integration with Vue projects.
+
 ## Contributing
 
 Pull requests and issues are welcome! Please follow the code style and add tests for new rules.
