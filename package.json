@@ -1,0 +1,43 @@
+{
+  "name": "bunderlog-forge",
+  "version": "0.0.0",
+  "description": "Bunderlog is a centralized plain text log system that provides a simple yet powerful solution for aggregating, storing, and querying log data across distributed applications with an intuitive interface for developers and system administrators.",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/bunderlog/forge.git"
+  },
+  "keywords": [
+    "log",
+    "logging",
+    "log-management",
+    "centralized",
+    "vue-modular",
+    "developer-friendly",
+    "open-source"
+  ],
+  "private": false,
+  "author": "Andrew Molyuk",
+  "license": "MIT",
+  "packageManager": "bun@1.2.13",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "build": "turbo run build",
+    "dev": "turbo run dev"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.6",
+    "husky": "^9.1.7",
+    "prettier": "^3.6.2",
+    "semantic-release": "^24.2.8",
+    "turbo": "^2.5.6"
+  }
+}

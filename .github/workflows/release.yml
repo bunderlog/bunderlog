@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'bun.lock'
+          registry-url: 'https://registry.npmjs.org/'
+
+      - uses: oven-sh/setup-bun@v2.0.2
+
+      - run: make install
+      - run: make build
+      - run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_AUTHOR_NAME: 'Andrew Molyuk'
+          GIT_AUTHOR_EMAIL: 'andrew@molyuk.com'
+          GIT_COMMITTER_NAME: 'Andrew Molyuk'
+          GIT_COMMITTER_EMAIL: 'andrew@molyuk.com'

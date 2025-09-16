@@ -1,0 +1,44 @@
+name: Test
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Validate commit messages
+        uses: wagoid/commitlint-github-action@v6
+        with:
+          configFile: .commitlintrc
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'bun.lock'
+          registry-url: 'https://registry.npmjs.org/'
+
+      - uses: oven-sh/setup-bun@v2.0.2
+
+      - run: make install
+
+      - run: make build
+
+      # - uses: codacy/codacy-coverage-reporter-action@v1.3.0
+      #   with:
+      #     project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+      #     coverage-reports: coverage/lcov.info

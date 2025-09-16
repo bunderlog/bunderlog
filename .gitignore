@@ -1,0 +1,26 @@
+# Node dependencies
+node_modules
+dist
+
+# System files
+.DS_Store
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Editor/IDE settings
+.idea
+.vscode
+
+# Logs and build info
+*.log
+*.tsbuildinfo
+
+# Test and cache outputs
+coverage
+.cache
+
+# Turbo cache
+.turbo
