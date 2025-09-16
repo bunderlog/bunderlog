@@ -24,3 +24,6 @@ coverage
 
 # Turbo cache
 .turbo
+
+# Go binaries
+bin

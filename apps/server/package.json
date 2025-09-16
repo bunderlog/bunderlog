@@ -1,0 +1,10 @@
+{
+  "name": "server",
+  "scripts": {
+    "dev": "go run main.go",
+    "build": "go build -o dist/server main.go",
+    "lint": "../../bin/golangci-lint run",
+    "test": "go test ./...",
+    "update": "go get -u ./... && go mod tidy"
+  }
+}

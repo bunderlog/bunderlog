@@ -5,6 +5,15 @@
     ["@semantic-release/release-notes-generator", { "preset": "conventionalcommits" }],
     "@semantic-release/changelog",
     "@semantic-release/git",
-    "@semantic-release/github"
+    "@semantic-release/github",
+    [
+      "@codedependant/semantic-release-docker",
+      {
+        "dockerImage": "bunderlog/forge",
+        "dockerFile": "Dockerfile",
+        "dockerTags": ["latest", "{{version}}", "{{major}}-latest", "{{major}}.{{minor}}"],
+        "dockerPublish": true
+      }
+    ]
   ]
 }
