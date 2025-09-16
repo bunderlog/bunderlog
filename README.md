@@ -1,7 +1,7 @@
 # bunderlog-forge
 
 [![Build Status](https://github.com/bunderlog/forge/actions/workflows/test.yml//badge.svg)](https://github.com/bunderlog/forge/actions/workflows/test.yml)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/eef014ae22a74e65afaef14e987a1b5e)](https://app.codacy.com/gh/bunderlog/forge/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/615576bc2e9a4c3693f167397d427763)](https://app.codacy.com/gh/bunderlog/forge/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![GitHub issues](https://img.shields.io/github/issues/bunderlog/forge)](https://github.com/bunderlog/forge/issues)
 [![semantic-release: conventional](https://img.shields.io/badge/semantic--release-conventional-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 [![GitHub license](https://img.shields.io/github/license/bunderlog/forge?color=blue)](./LICENSE.md)
