@@ -31,6 +31,13 @@ jobs:
 
       - run: make install
       - run: make build
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -40,3 +47,4 @@ jobs:
           GIT_COMMITTER_EMAIL: 'andrew@molyuk.com'
           DOCKER_REGISTRY_USER: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+          HUSKY: 0
