@@ -16,8 +16,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/api/", handler)
 
-	// Serve static files from web-dist for non-API requests
-	fs := http.FileServer(http.Dir("web-dist"))
+	// Serve static files from web for non-API requests
+	fs := http.FileServer(http.Dir("web"))
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		// If path starts with /api/, let the API handler handle it
 		if len(r.URL.Path) >= 5 && r.URL.Path[:5] == "/api/" {
@@ -26,7 +26,7 @@ func main() {
 		}
 
 		// Try to serve the static file
-		f, err := http.Dir("web-dist").Open(r.URL.Path)
+		f, err := http.Dir("web").Open(r.URL.Path)
 		if err == nil {
 			stat, statErr := f.Stat()
 			if err := f.Close(); err != nil {
@@ -39,7 +39,7 @@ func main() {
 		}
 
 		// If file not found, serve index.html (SPA fallback)
-		index, err := http.Dir("web-dist").Open("index.html")
+		index, err := http.Dir("web").Open("index.html")
 		if err != nil {
 			http.NotFound(w, r)
 			return
