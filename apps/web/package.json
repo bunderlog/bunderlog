@@ -5,7 +5,7 @@
     "lint": "eslint --ext .js,.ts,.vue src",
     "test": "echo \"No tests specified\" && exit 0",
     "dev": "vite",
-    "update": "npx npm-check-updates -u"
+    "update": "bunx npm-check-updates -u"
   },
   "dependencies": {
     "eslint": "^9.36.0",

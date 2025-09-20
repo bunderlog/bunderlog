@@ -8,10 +8,10 @@ install:
 	bun install
 
 lint: install 
-	npx turbo lint
+	bunx turbo lint
 
 test: lint
-	npx turbo test
+	bunx turbo test
 
 build: test
 	docker build -t andrewmolyuk/bunderlog:latest .
@@ -20,11 +20,11 @@ preview:
 	docker run --rm --publish 8080:8080 andrewmolyuk/bunderlog:latest
 
 dev: install
-	npx turbo dev
+	bunx turbo dev
 
 update: install
-	npx turbo update
-	npx npm-check-updates -u && bun install
+	bunx turbo update
+	bunx npm-check-updates -u && bun install
 
 next:
 	git pull origin main
