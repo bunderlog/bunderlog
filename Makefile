@@ -31,4 +31,7 @@ next:
 	git checkout main
 	git merge next
 	git push -u origin main
-	
+
+clean:
+	@chmod +x .scripts/clean.sh || true
+	@.scripts/clean.sh
