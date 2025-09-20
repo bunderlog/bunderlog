@@ -8,8 +8,14 @@
     "update": "bunx npm-check-updates -u"
   },
   "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "eslint": "^9.36.0",
     "eslint-plugin-vue": "^10.4.0",
+    "lucide-vue-next": "^0.544.0",
+    "reka-ui": "^2.5.0",
+    "tailwind-merge": "^3.3.1",
+    "tw-animate-css": "^1.3.8",
     "vue": "^3.5.21"
   },
   "devDependencies": {
@@ -17,9 +23,11 @@
     "@eslint/json": "^0.13.2",
     "@eslint/markdown": "^7.2.0",
     "@tailwindcss/vite": "^4.1.13",
+    "@types/node": "^24.5.2",
     "@types/vue": "^2.0.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.8.1",
+    "eslint-plugin-vue-modular": "^1.19.2",
     "globals": "^16.4.0",
     "tailwindcss": "^4.1.13",
     "typescript": "~5.9.2",

@@ -32,8 +32,8 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
+    "@codedependant/semantic-release-docker": "^5.1.1",
     "@commitlint/config-conventional": "^19.8.1",
-    "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^11.0.6",
     "husky": "^9.1.7",
@@ -41,8 +41,5 @@
     "semantic-release": "^24.2.9",
     "turbo": "^2.5.6"
   },
-  "dependencies": {
-    "@codedependant/semantic-release-docker": "^5.1.1",
-    "eslint-plugin-vue-modular": "^1.19.2"
-  }
+  "dependencies": {}
 }
