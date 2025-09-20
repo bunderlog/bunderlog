@@ -8,7 +8,7 @@
     [
       "@codedependant/semantic-release-docker",
       {
-        "dockerImage": "bunderlog/forge",
+        "dockerImage": "andrewmolyuk/bunderlog",
         "dockerFile": "Dockerfile",
         "dockerTags": ["latest", "{{version}}", "{{major}}-latest", "{{major}}.{{minor}}"],
         "dockerPublish": true

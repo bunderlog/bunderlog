@@ -14,10 +14,10 @@ test: lint
 	npx turbo test
 
 build: test
-	docker build -t bunderlog-forge .
+	docker build -t andrewmolyuk/bunderlog:latest .
 
 preview: 
-	docker run --rm --publish 8080:8080 bunderlog-forge
+	docker run --rm --publish 8080:8080 andrewmolyuk/bunderlog:latest
 
 dev: install
 	npx turbo dev
