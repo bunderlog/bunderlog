@@ -25,3 +25,10 @@ dev: install
 update: install
 	npx turbo update
 	npx npm-check-updates -u && bun install
+
+next:
+	git pull origin main
+	git checkout main
+	git merge next
+	git push -u origin main
+	
