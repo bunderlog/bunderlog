@@ -18,7 +18,7 @@
   "private": false,
   "author": "Andrew Molyuk",
   "license": "MIT",
-  "packageManager": "bun@1.2.13",
+  "packageManager": "bun@1.2.22",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -26,8 +26,8 @@
   "scripts": {
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "build": "turbo run build",
     "dev": "turbo run dev",
+    "update": "turbo run update",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -38,7 +38,7 @@
     "@semantic-release/github": "^11.0.6",
     "husky": "^9.1.7",
     "prettier": "^3.6.2",
-    "semantic-release": "^24.2.8",
+    "semantic-release": "^24.2.9",
     "turbo": "^2.5.6"
   },
   "dependencies": {

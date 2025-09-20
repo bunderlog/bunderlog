@@ -5,7 +5,7 @@ install:
 	@if ! command -v ./bin/golangci-lint >/dev/null 2>&1; then \
 	  curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s v2.4.0; \
 	fi
-	bun install --no-audit --no-fund
+	bun install
 
 lint: install 
 	npx turbo lint
@@ -21,3 +21,4 @@ dev: install
 
 update: install
 	npx turbo update
+	npx npm-check-updates -u && bun install
