@@ -6,7 +6,7 @@
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-  "postCreateCommand": "make install",
+  "postCreateCommand": "if [ -d /home/dev/.ssh ]; then chown -R dev:dev /home/dev/.ssh || true; chmod 700 /home/dev/.ssh || true; find /home/dev/.ssh -type f -exec chmod 600 {} \\; || true; fi; if [ -f /home/dev/.gitconfig ]; then chown dev:dev /home/dev/.gitconfig || true; chmod 600 /home/dev/.gitconfig || true; fi; make install",
   "customizations": {
     "vscode": {
       "extensions": ["oxc.oxc-vscode", "streetsidesoftware.code-spell-checker", "vitest.explorer"],
@@ -21,6 +21,7 @@
   "mounts": [
     "source=${localEnv:HOME}/.ssh,target=/home/dev/.ssh,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.config/gh,target=/home/dev/.config/gh,type=bind,consistency=cached",
-    "source=/run/host-services/ssh-auth.sock,target=/ssh-agent.sock,type=bind,consistency=cached"
+    "source=/run/host-services/ssh-auth.sock,target=/ssh-agent.sock,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.gitconfig,target=/home/dev/.gitconfig,type=bind,consistency=cached"
   ]
 }
