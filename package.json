@@ -3,11 +3,14 @@
   "private": true,
   "type": "module",
   "module": "index.ts",
+  "dependencies": {
+    "turbo": "^2.9.16"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.9.3"
   },
-  "packageManager": "bun"
+  "packageManager": "bun@1.1.38"
 }
