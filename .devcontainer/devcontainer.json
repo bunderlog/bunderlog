@@ -34,5 +34,12 @@
   "mounts": [
     "source=${localEnv:HOME}/.ssh,target=/home/dev/.ssh,type=bind,consistency=cached",
     "source=/run/host-services/ssh-auth.sock,target=/ssh-agent.sock,type=bind,consistency=cached"
-  ]
+  ],
+  "forwardPorts": [5173],
+  "portsAttributes": {
+    "5173": {
+      "label": "Vue Dev Server",
+      "onAutoForward": "notify"
+    }
+  }
 }

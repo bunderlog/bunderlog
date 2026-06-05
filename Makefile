@@ -1,9 +1,12 @@
-.PHONY: install update
+.PHONY: install update dev
 
 install:
-	bun ci
+	bun install
 
 update:
 	bun upgrade
 	bun update -g
 	bun update
+
+dev:
+	bunx turbo run dev
