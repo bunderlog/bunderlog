@@ -1,6 +1,10 @@
 {
   "name": "bunderlog",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "type": "module",
   "module": "index.ts",
   "dependencies": {
