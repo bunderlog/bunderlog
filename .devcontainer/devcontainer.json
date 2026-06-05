@@ -1,0 +1,33 @@
+{
+  "name": "bunderlog",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "postCreateCommand": "make install",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "oxc.oxc-vscode",
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "[json]": {
+          "editor.defaultFormatter": "oxc.oxc-vscode"
+        },
+        "[jsonc]": {
+          "editor.defaultFormatter": "oxc.oxc-vscode"
+        },
+        "cSpell.words": ["bunderlog", "molyuk", "oxfmt"]
+      },
+      "extensions": [
+        "cloudflare.cloudflare-workers-bindings-extension",
+        "oxc.oxc-vscode",
+        "streetsidesoftware.code-spell-checker",
+        "vue.volar"
+      ]
+    }
+  },
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/home/dev/.ssh,type=bind,consistency=cached",
+    "source=/run/host-services/ssh-auth.sock,target=/ssh-agent.sock,type=bind,consistency=cached"
+  ]
+}
