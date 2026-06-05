@@ -10,13 +10,18 @@
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "oxc.oxc-vscode",
         "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/usr/bin/zsh"
+          }
+        },
         "[json]": {
           "editor.defaultFormatter": "oxc.oxc-vscode"
         },
         "[jsonc]": {
           "editor.defaultFormatter": "oxc.oxc-vscode"
         },
-        "cSpell.words": ["bunderlog", "molyuk", "oxfmt"]
+        "cSpell.words": ["bunderlog", "bunx", "molyuk", "oxfmt"]
       },
       "extensions": [
         "cloudflare.cloudflare-workers-bindings-extension",
