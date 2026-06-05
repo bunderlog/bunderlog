@@ -1,9 +1,0 @@
-{
-  "editor.formatOnSave": true,
-  "terminal.integrated.defaultProfile.linux": "zsh",
-  "editor.defaultFormatter": "oxc.oxc-vscode",
-  "cSpell.words": ["bunderlog", "bunx", "oxfmt"],
-  "[jsonc]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
-  }
-}
