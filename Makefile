@@ -1,6 +1,9 @@
-.PHONY: install
+.PHONY: install update
 
 install:
-	node --version
-	bun --version
 	bun ci
+
+update:
+	bun upgrade
+	bun update -g
+	bun update
