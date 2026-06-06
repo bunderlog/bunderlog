@@ -26,7 +26,15 @@
         "[jsonc]": {
           "editor.defaultFormatter": "oxc.oxc-vscode"
         },
-        "cSpell.words": ["bunderlog", "bunx", "consolas", "molyuk", "oxfmt", "oxlint"],
+        "cSpell.words": [
+          "bunderlog",
+          "bunx",
+          "commandhistory",
+          "consolas",
+          "molyuk",
+          "oxfmt",
+          "oxlint"
+        ],
         "explorer.fileNesting.enabled": true,
         "explorer.fileNesting.patterns": {
           "tsconfig.json": "tsconfig.*.json, env.d.ts, typed-router.d.ts",
@@ -44,7 +52,8 @@
   },
   "mounts": [
     "source=${localEnv:HOME}/.ssh,target=/home/dev/.ssh,type=bind,consistency=cached",
-    "source=/run/host-services/ssh-auth.sock,target=/ssh-agent.sock,type=bind,consistency=cached"
+    "source=/run/host-services/ssh-auth.sock,target=/ssh-agent.sock,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.zsh_history,target=/home/dev/.zsh_history,type=bind,consistency=cached"
   ],
   "forwardPorts": [5173],
   "portsAttributes": {
@@ -52,5 +61,6 @@
       "label": "Vue Dev Server",
       "onAutoForward": "notify"
     }
-  }
+  },
+  "remoteUser": "dev"
 }
