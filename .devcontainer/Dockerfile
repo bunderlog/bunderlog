@@ -23,4 +23,4 @@ RUN curl -fsSL https://bun.sh/install | bash \
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || true
 
 # Install global npm packages
-RUN bun add -g oxfmt turbo
+RUN bun add -g oxfmt oxlint turbo
