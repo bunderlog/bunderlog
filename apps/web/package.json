@@ -6,11 +6,10 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "run-p type-check \"build-only {@}\" --",
-    "preview": "vite preview",
-    "test:unit": "vitest",
+    "test": "CI=CI vitest",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "format": "oxfmt src/"
+    "lint": "oxlint --fix src"
   },
   "dependencies": {
     "pinia": "^3.0.4",
