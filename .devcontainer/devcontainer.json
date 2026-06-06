@@ -42,7 +42,7 @@
         "explorer.fileNesting.patterns": {
           "tsconfig.json": "tsconfig.*.json, env.d.ts, typed-router.d.ts",
           "vite.config.*": "vitest.config.*",
-          "package.json": "bun.lock, .oxlint*, .oxfmt*, .editorconfig"
+          "package.json": "bun.lock, .oxlint*, .oxfmt*, .commitlint*"
         }
       },
       "extensions": [
