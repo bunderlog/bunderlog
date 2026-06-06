@@ -7,6 +7,11 @@
   "customizations": {
     "vscode": {
       "settings": {
+        "editor.fontFamily": "'JetBrains Mono', Consolas, 'Courier New', monospace",
+        "editor.fontSize": 13,
+        "editor.fontLigatures": true,
+        "editor.letterSpacing": 0.4,
+        "editor.smoothScrolling": true,
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "oxc.oxc-vscode",
         "terminal.integrated.defaultProfile.linux": "zsh",
@@ -21,7 +26,13 @@
         "[jsonc]": {
           "editor.defaultFormatter": "oxc.oxc-vscode"
         },
-        "cSpell.words": ["bunderlog", "bunx", "molyuk", "oxfmt"]
+        "cSpell.words": ["bunderlog", "bunx", "consolas", "molyuk", "oxfmt", "oxlint"],
+        "explorer.fileNesting.enabled": true,
+        "explorer.fileNesting.patterns": {
+          "tsconfig.json": "tsconfig.*.json, env.d.ts, typed-router.d.ts",
+          "vite.config.*": "vitest.config.*",
+          "package.json": "bun.lock, .oxlint*, .oxfmt*, .editorconfig"
+        }
       },
       "extensions": [
         "cloudflare.cloudflare-workers-bindings-extension",
