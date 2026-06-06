@@ -13,6 +13,9 @@
         "editor.letterSpacing": 0.4,
         "editor.smoothScrolling": true,
         "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.oxlint": "explicit"
+        },
         "editor.defaultFormatter": "oxc.oxc-vscode",
         "terminal.integrated.defaultProfile.linux": "zsh",
         "terminal.integrated.profiles.linux": {
