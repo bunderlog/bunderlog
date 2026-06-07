@@ -28,6 +28,10 @@ next:
 		fi; \
 	else \
 		git switch next; \
+		if ! git rev-parse --verify origin/next >/dev/null 2>&1; then \
+			git branch --unset-upstream next; \
+			git push -u origin next; \
+		fi; \
 	fi
 
 merge:

@@ -23,3 +23,6 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 
 # Install global npm packages
 RUN bun add -g oxfmt oxlint turbo
+
+# Disable Turbo telemetry
+RUN turbo telemetry disable
