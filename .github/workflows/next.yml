@@ -12,8 +12,6 @@ permissions:
 jobs:
   next:
     runs-on: ubuntu-latest
-    env:
-      TURBO_TELEMETRY_DISABLED: 1
     steps:
       - uses: actions/checkout@v6
         with:

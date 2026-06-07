@@ -20,9 +20,3 @@ RUN curl -fsSL https://bun.sh/install | bash \
 
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || true
-
-# Install global npm packages
-RUN bun add -g oxfmt oxlint turbo
-
-# Disable Turbo telemetry
-RUN turbo telemetry disable

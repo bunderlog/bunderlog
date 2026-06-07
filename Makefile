@@ -1,7 +1,9 @@
 .PHONY: install update lint test dev build next merge
 
 install:
+	bun add -g oxfmt oxlint turbo
 	bun install
+	turbo telemetry disable
 
 update:
 	bun upgrade
