@@ -8,3 +8,12 @@ yarn.lock
 
 # Ignore turbo files
 .turbo/
+
+# Ignore Vite files
+dist/
+
+# Ignore test coverage files
+coverage/
+
+# Ignore VSCode files
+.vscode/
