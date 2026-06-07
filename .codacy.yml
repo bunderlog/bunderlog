@@ -1,13 +1,5 @@
 # .codacy.yml
 coverage:
-  ignoreFiles:
-    - '.devcontainer/**'
-    - '.github/**'
-    - '.husky/**'
-    - 'assets/**'
-    - 'tools/**'
-    - '**/coverage/**'
-    - '**/dist/**'
-    - '**/*.config.ts'
-    - '**/tests/**'
-    - '**/*.json'
+  includeFiles:
+    - '**/src/**/*.ts'
+    - '**/src/**/*.vue'
