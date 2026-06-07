@@ -6,7 +6,7 @@ RUN apt-get update \
     git gnupg openssh-client curl make nodejs zsh unzip ca-certificates
 
 # Clean up apt cache to reduce image size
-RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user for development
 RUN useradd --create-home --user-group --shell /bin/zsh dev
