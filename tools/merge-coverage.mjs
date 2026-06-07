@@ -1,17 +1,13 @@
 // tools/merge-coverage.mjs
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs'
 import { glob } from 'glob'
 import { dirname, resolve, relative } from 'path'
 
 const ROOT = process.cwd()
 
-function safePath(filePath) {
+function validatePath(filePath) {
   const abs = resolve(ROOT, filePath)
   if (!abs.startsWith(ROOT + '/')) {
     throw new Error(`Path traversal detected: ${filePath}`)
-  }
-  if (!existsSync(abs)) {
-    throw new Error(`File not found: ${abs}`)
   }
   return abs
 }
@@ -21,11 +17,11 @@ const files = await glob('**/coverage/lcov.info', {
   cwd: ROOT,
 })
 
-const merged = files
-  .map((lcovPath) => {
-    const safeAbs = safePath(lcovPath) // ← валидированный путь
+const parts = await Promise.all(
+  files.map(async (lcovPath) => {
+    const safeAbs = validatePath(lcovPath)
     const pkgDir = resolve(ROOT, dirname(dirname(lcovPath)))
-    const content = readFileSync(safeAbs, 'utf8') // ← литерал из safePath
+    const content = await Bun.file(safeAbs).text() // ← не fs
 
     return content
       .split('\n')
@@ -35,15 +31,14 @@ const merged = files
         if (filePath.includes('node_modules')) return null
         if (filePath.startsWith('\x00')) return null
         const absPath = resolve(pkgDir, filePath)
-        if (!absPath.startsWith(ROOT + '/')) return null // path traversal в SF:
-        const relPath = relative(ROOT, absPath)
-        return `SF:${relPath}`
+        if (!absPath.startsWith(ROOT + '/')) return null
+        return `SF:${relative(ROOT, absPath)}`
       })
       .filter(Boolean)
       .join('\n')
-  })
-  .join('\n')
+  }),
+)
 
-mkdirSync('coverage', { recursive: true })
-writeFileSync(resolve(ROOT, 'coverage/lcov.info'), merged)
+await Bun.write(resolve(ROOT, 'coverage/lcov.info'), parts.join('\n'))
+
 console.log(`Merged ${files.length} files → coverage/lcov.info`)
