@@ -1,12 +1,9 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'fs'
-import { glob } from 'glob'
 import { dirname, resolve, relative } from 'path'
 
 const ROOT = process.cwd()
 
-const files = await glob('**/coverage/lcov.info', {
-  ignore: ['**/node_modules/**', '**/.turbo/**', 'coverage/lcov.info'],
-})
+const files = ['apps/web/coverage/lcov.info']
 
 const merged = files
   .map((lcovPath) => {
