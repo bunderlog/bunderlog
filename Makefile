@@ -47,3 +47,11 @@ merge:
 	git push -u origin main
 	sleep 1
 	git fetch --prune
+
+clean:
+	rm -rf node_modules
+	rm -rf dist
+	rm -rf coverage
+	rm -rf apps/web/node_modules
+	rm -rf apps/web/dist
+	rm -rf apps/web/coverage
