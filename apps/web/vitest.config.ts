@@ -12,7 +12,6 @@ export default mergeConfig(
       coverage: {
         reporter: ['lcovonly', 'text'],
         exclude: ['**/types.ts'],
-        reportsDirectory: fileURLToPath(new URL('./../../coverage', import.meta.url)),
       },
     },
   }),

@@ -1,4 +1,4 @@
-.PHONY: install update lint test dev next merge
+.PHONY: install update lint test dev build next merge
 
 install:
 	bun install
@@ -8,14 +8,20 @@ update:
 	bun update -g
 	bun update
 
-lint:
+lint: install
 	bunx turbo run lint
 
-test:
+test: lint
+	rm -rf coverage
 	bunx turbo run test
+	bun tools/merge-coverage.mjs
 
-dev:
+dev: install
 	bunx turbo run dev
+
+build: install
+	rm -Rf dist
+	bunx turbo run build
 
 next:
 	@if ! git rev-parse --verify next >/dev/null 2>&1; then \
