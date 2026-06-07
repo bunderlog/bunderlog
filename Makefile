@@ -18,11 +18,22 @@ dev:
 	bunx turbo run dev
 
 next:
-	git rev-parse --verify next >/dev/null 2>&1 || git branch next
-	git switch next
+	@if ! git rev-parse --verify next >/dev/null 2>&1; then \
+		if git rev-parse --verify origin/next >/dev/null 2>&1; then \
+			git checkout --track origin/next; \
+		else \
+			git branch next; \
+			git switch next; \
+			git push -u origin next; \
+		fi; \
+	else \
+		git switch next; \
+	fi
 
 merge:
 	git pull origin main
 	git checkout main
 	git merge next
 	git push -u origin main
+	sleep 1
+	git fetch --prune
