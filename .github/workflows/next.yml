@@ -12,6 +12,8 @@ permissions:
 jobs:
   next:
     runs-on: ubuntu-latest
+    env:
+      TURBO_TELEMETRY_DISABLED: 1
     steps:
       - uses: actions/checkout@v6
         with:
@@ -30,6 +32,8 @@ jobs:
           registry-url: 'https://registry.npmjs.org/'
 
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+
+      - run: make install
 
       - run: make test
 
