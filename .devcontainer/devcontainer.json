@@ -34,10 +34,13 @@
           "bunx",
           "codacy",
           "commandhistory",
+          "commitlint",
+          "commitlintrc",
           "consolas",
           "molyuk",
           "oxfmt",
-          "oxlint"
+          "oxlint",
+          "wagoid"
         ],
         "explorer.fileNesting.enabled": true,
         "explorer.fileNesting.patterns": {

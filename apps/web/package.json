@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "run-p type-check \"build-only {@}\" --",
-    "test": "CI=CI vitest",
-    "build-only": "vite build",
+    "test": "CI=CI vitest --coverage",
     "type-check": "vue-tsc --build",
     "lint": "oxlint --fix src"
   },
