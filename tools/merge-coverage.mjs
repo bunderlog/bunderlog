@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync } from 'fs'
+import { readFileSync, writeFileSync, mkdirSync, realpathSync } from 'fs'
 import { dirname, resolve, relative } from 'path'
 
 const ROOT = process.cwd()
@@ -7,8 +7,14 @@ const files = ['apps/web/coverage/lcov.info']
 
 const merged = files
   .map((lcovPath) => {
-    const pkgDir = resolve(ROOT, dirname(dirname(lcovPath))) // apps/ingest
-    const content = readFileSync(lcovPath, 'utf8')
+    const absLcov = resolve(ROOT, lcovPath)
+    // Resolve symlinks to the real path and ensure it stays inside the repository root
+    const realAbsLcov = realpathSync(absLcov)
+    if (relative(ROOT, realAbsLcov).startsWith('..')) {
+      throw new Error(`Invalid lcov path (outside root): ${lcovPath}`)
+    }
+    const pkgDir = resolve(ROOT, dirname(dirname(realAbsLcov))) // apps/ingest
+    const content = readFileSync(realAbsLcov, 'utf8')
 
     return content
       .split('\n')
