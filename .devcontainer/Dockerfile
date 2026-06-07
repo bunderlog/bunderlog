@@ -3,10 +3,9 @@ FROM debian:stable-slim
 # Install necessary packages for development (non-interactive)
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    git gnupg openssh-client curl make nodejs zsh unzip ca-certificates
-
-# Clean up apt cache to reduce image size
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+    git gnupg openssh-client curl make nodejs zsh unzip ca-certificates \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user for development
 RUN useradd --create-home --user-group --shell /bin/zsh dev
