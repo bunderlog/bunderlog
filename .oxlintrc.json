@@ -1,0 +1,13 @@
+{
+  "plugins": [
+    "eslint",
+    "import",
+    "node",
+    "oxc",
+    "promise",
+    "typescript",
+    "unicorn",
+    "vitest",
+    "vue"
+  ]
+}
