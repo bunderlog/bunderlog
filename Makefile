@@ -1,21 +1,29 @@
-.PHONY: install update lint test dev next merge
+.PHONY: install update lint test dev build next merge
 
 install:
+	bun add -g oxfmt oxlint turbo
 	bun install
+	turbo telemetry disable
 
 update:
 	bun upgrade
 	bun update -g
 	bun update
 
-lint:
+lint: install
 	bunx turbo run lint
 
-test:
+test: lint
+	rm -rf coverage
 	bunx turbo run test
+	bun tools/merge-coverage.mjs
 
-dev:
+dev: install
 	bunx turbo run dev
+
+build: install
+	rm -Rf dist
+	bunx turbo run build
 
 next:
 	@if ! git rev-parse --verify next >/dev/null 2>&1; then \
@@ -41,3 +49,11 @@ merge:
 	git push -u origin main
 	sleep 1
 	git fetch --prune
+
+clean:
+	rm -rf node_modules
+	rm -rf dist
+	rm -rf coverage
+	rm -rf apps/web/node_modules
+	rm -rf apps/web/dist
+	rm -rf apps/web/coverage

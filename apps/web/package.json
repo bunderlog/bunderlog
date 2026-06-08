@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "run-p type-check \"build-only {@}\" --",
-    "test": "CI=CI vitest --coverage",
     "type-check": "vue-tsc --build",
-    "lint": "oxlint --fix src"
+    "build-only": "vite build",
+    "lint": "oxlint --fix src",
+    "test": "CI=CI vitest --coverage"
   },
   "dependencies": {
     "pinia": "^3.0.4",

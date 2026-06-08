@@ -1,0 +1,5 @@
+# .codacy.yml
+coverage:
+  includeFiles:
+    - '**/src/**/*.ts'
+    - '**/src/**/*.vue'
