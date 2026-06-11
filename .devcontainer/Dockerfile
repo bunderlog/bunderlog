@@ -3,9 +3,11 @@ FROM debian:stable-slim
 # Install necessary packages for development (non-interactive)
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    git gnupg openssh-client curl make nodejs zsh unzip ca-certificates \
+    git gnupg openssh-client curl make nodejs npm zsh unzip ca-certificates \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+RUN npm install -g @anthropic-ai/claude-code
 
 # Create a non-root user for development
 RUN useradd --create-home --user-group --shell /bin/zsh dev
