@@ -29,7 +29,7 @@ let timer: ReturnType<typeof setInterval>
 
 onMounted(() => {
   timer = setInterval(() => {
-    const line = ALL_LINES[index]
+    const line = ALL_LINES.at(index)
     if (line !== undefined) {
       index++
       visibleLines.value = [...visibleLines.value, line]
