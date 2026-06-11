@@ -5,105 +5,31 @@ import TerminalPreview from '@/components/hero/TerminalPreview.vue'
 </script>
 
 <template>
-  <section class="hero">
-    <div class="hero__grid-bg" />
-    <div class="hero__inner">
-      <div class="hero__content">
+  <section class="relative px-6 pt-[100px] pb-20 overflow-hidden">
+    <div
+      class="absolute inset-0 grid-bg opacity-30"
+      style="mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 100%)"
+    />
+
+    <div class="relative max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-[60px] items-center">
+      <div class="flex flex-col gap-5">
         <SectionLabel text="Cloudflare-native log management" />
-        <h1 class="hero__title">
+        <h1 class="font-ui font-bold text-hero tracking-[-0.04em] leading-[1.05] text-fg">
           Log management<br />
           built for<br />
-          <span class="hero__accent">the edge</span>
+          <span class="text-brand">the edge</span>
         </h1>
-        <p class="hero__sub">
+        <p class="text-[17px] text-muted leading-[1.65] max-w-[440px]">
           Bunderlog streams, stores, and searches your logs on Cloudflare's
           global network — where your app already runs. Free tier, zero infra.
         </p>
         <CtaButtons />
-        <p class="hero__note">No credit card required · 500k logs/day free</p>
+        <p class="text-[13px] text-muted -mt-2">No credit card required · 500k logs/day free</p>
       </div>
-      <div class="hero__preview">
+
+      <div class="flex justify-end max-md:justify-center">
         <TerminalPreview />
       </div>
     </div>
   </section>
 </template>
-
-<style scoped>
-.hero {
-  position: relative;
-  padding: 100px 24px 80px;
-  overflow: hidden;
-}
-
-.hero__grid-bg {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 48px 48px;
-  opacity: 0.3;
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 100%);
-}
-
-.hero__inner {
-  position: relative;
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
-  align-items: center;
-}
-
-.hero__content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.hero__title {
-  font-family: var(--font-ui);
-  font-size: clamp(40px, 5vw, 68px);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1.05;
-  color: var(--text);
-}
-
-.hero__accent {
-  color: var(--brand);
-}
-
-.hero__sub {
-  font-size: 17px;
-  color: var(--muted);
-  line-height: 1.65;
-  max-width: 440px;
-}
-
-.hero__note {
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: -8px;
-}
-
-.hero__preview {
-  display: flex;
-  justify-content: flex-end;
-}
-
-@media (max-width: 900px) {
-  .hero__inner {
-    grid-template-columns: 1fr;
-    gap: 40px;
-  }
-  .hero__preview {
-    justify-content: center;
-  }
-  .hero__title {
-    font-size: clamp(36px, 8vw, 52px);
-  }
-}
-</style>

@@ -3,17 +3,7 @@ defineProps<{ text: string }>()
 </script>
 
 <template>
-  <p class="label">{{ text }}</p>
+  <p class="inline-block font-ui text-[11px] font-semibold tracking-[0.12em] uppercase text-brand">
+    {{ text }}
+  </p>
 </template>
-
-<style scoped>
-.label {
-  display: inline-block;
-  font-family: var(--font-ui);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--brand);
-}
-</style>

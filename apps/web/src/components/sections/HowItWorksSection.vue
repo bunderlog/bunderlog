@@ -4,23 +4,24 @@ import StepCard from '@/components/features/StepCard.vue'
 </script>
 
 <template>
-  <section id="how-it-works" class="how">
-    <div class="how__inner">
-      <div class="how__header">
+  <section id="how-it-works" class="py-24 px-6 bg-surface border-t border-b border-border">
+    <div class="max-w-[760px] mx-auto flex flex-col gap-12">
+
+      <div class="flex flex-col gap-3">
         <SectionLabel text="How it works" />
-        <SectionTitle style="font-size: clamp(28px, 3vw, 40px);">
+        <SectionTitle class="text-section">
           Up and running<br />in three minutes
         </SectionTitle>
       </div>
 
-      <div class="how__steps">
+      <div class="flex flex-col">
         <StepCard
           :step="1"
           title="Install the SDK"
           description="One package, no transitive dependencies. Works in any JavaScript runtime."
           code="npm install bunderlog"
         />
-        <div class="how__divider" />
+        <div class="w-px h-8 bg-border ml-[17px]" />
         <StepCard
           :step="2"
           title="Send your first log"
@@ -28,49 +29,14 @@ import StepCard from '@/components/features/StepCard.vue'
           code="const log = logger({ token: process.env.LOG_TOKEN, service: 'api' })
 log.info('Server started', { port: 3000 })"
         />
-        <div class="how__divider" />
+        <div class="w-px h-8 bg-border ml-[17px]" />
         <StepCard
           :step="3"
           title="See it in the dashboard"
           description="Live tail, full-text search, and time-series charts. All in one place, no configuration required."
         />
       </div>
+
     </div>
   </section>
 </template>
-
-<style scoped>
-.how {
-  padding: 96px 24px;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-
-.how__inner {
-  max-width: 760px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 48px;
-}
-
-.how__header {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.how__steps {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.how__divider {
-  width: 1px;
-  height: 32px;
-  background: var(--border);
-  margin-left: 17px;
-}
-</style>

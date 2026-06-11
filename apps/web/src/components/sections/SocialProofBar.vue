@@ -5,44 +5,12 @@ const platforms = ['Node.js', 'Cloudflare Workers', 'Browser', 'Bun', 'Deno', 'N
 </script>
 
 <template>
-  <section class="proof">
-    <div class="proof__inner">
-      <p class="proof__label">Works everywhere you ship</p>
-      <div class="proof__tags">
+  <section class="border-t border-b border-border bg-surface py-7 px-6">
+    <div class="max-w-[1200px] mx-auto flex items-center gap-6 flex-wrap">
+      <p class="text-[13px] font-medium text-muted whitespace-nowrap shrink-0">Works everywhere you ship</p>
+      <div class="flex gap-2 flex-wrap">
         <CompatTag v-for="p in platforms" :key="p" :label="p" />
       </div>
     </div>
   </section>
 </template>
-
-<style scoped>
-.proof {
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  padding: 28px 24px;
-}
-
-.proof__inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-.proof__label {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.proof__tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-</style>

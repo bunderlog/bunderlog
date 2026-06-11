@@ -1,13 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="landing">
+  <div class="w-full">
     <slot />
   </div>
 </template>
-
-<style scoped>
-.landing {
-  width: 100%;
-}
-</style>

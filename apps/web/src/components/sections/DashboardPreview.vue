@@ -2,45 +2,50 @@
 import LogRow from '@/components/features/LogRow.vue'
 
 const rows = [
-  { ts: '2024-03-15 10:23:49', level: 'FATAL' as const, service: 'worker',   message: 'Out of memory',          meta: '' },
-  { ts: '2024-03-15 10:23:46', level: 'ERROR' as const, service: 'api',      message: 'DB timeout',             meta: '{ duration_ms: 5012 }' },
-  { ts: '2024-03-15 10:23:45', level: 'INFO'  as const, service: 'payments', message: 'Payment processed',      meta: '{ amount: 4200 }' },
-  { ts: '2024-03-15 10:23:44', level: 'WARN'  as const, service: 'api',      message: 'Rate limit at 80%',      meta: '{ token: "bnd_••••" }' },
-  { ts: '2024-03-15 10:23:43', level: 'DEBUG' as const, service: 'api',      message: 'Cache miss',             meta: '{ key: "user:42" }' },
-  { ts: '2024-03-15 10:23:41', level: 'INFO'  as const, service: 'api',      message: 'Database connected',     meta: '{ host: "db.prod" }' },
-  { ts: '2024-03-15 10:23:41', level: 'INFO'  as const, service: 'api',      message: 'Server started',         meta: '{ port: 3000 }' },
+  { ts: '2024-03-15 10:23:49', level: 'FATAL' as const, service: 'worker',   message: 'Out of memory',       meta: '' },
+  { ts: '2024-03-15 10:23:46', level: 'ERROR' as const, service: 'api',      message: 'DB timeout',          meta: '{ duration_ms: 5012 }' },
+  { ts: '2024-03-15 10:23:45', level: 'INFO'  as const, service: 'payments', message: 'Payment processed',   meta: '{ amount: 4200 }' },
+  { ts: '2024-03-15 10:23:44', level: 'WARN'  as const, service: 'api',      message: 'Rate limit at 80%',   meta: '{ token: "bnd_••••" }' },
+  { ts: '2024-03-15 10:23:43', level: 'DEBUG' as const, service: 'api',      message: 'Cache miss',          meta: '{ key: "user:42" }' },
+  { ts: '2024-03-15 10:23:41', level: 'INFO'  as const, service: 'api',      message: 'Database connected',  meta: '{ host: "db.prod" }' },
+  { ts: '2024-03-15 10:23:41', level: 'INFO'  as const, service: 'api',      message: 'Server started',      meta: '{ port: 3000 }' },
 ]
 </script>
 
 <template>
-  <section id="dashboard" class="preview">
-    <div class="preview__inner">
-      <div class="preview__header">
-        <p class="preview__eyebrow">Dashboard preview</p>
-        <h2 class="preview__title">The whole picture, at a glance</h2>
-        <p class="preview__sub">
+  <section id="dashboard" class="py-24 px-6 bg-page">
+    <div class="max-w-[1200px] mx-auto flex flex-col gap-12">
+
+      <div class="flex flex-col gap-3 max-w-[540px]">
+        <p class="text-[11px] font-semibold tracking-[0.12em] uppercase text-brand">Dashboard preview</p>
+        <h2 class="font-ui font-semibold text-section tracking-[-0.03em] leading-[1.15] text-fg">
+          The whole picture, at a glance
+        </h2>
+        <p class="text-[15px] text-muted leading-[1.65]">
           Filter by service, level, or time range. Search across all fields.
           Click any row for a permalink.
         </p>
       </div>
 
-      <div class="preview__window">
-        <div class="preview__toolbar">
-          <div class="preview__toolbar-left">
-            <div class="preview__filter">All services</div>
-            <div class="preview__filter">All levels</div>
-            <div class="preview__search">
-              <span class="preview__search-icon">⌕</span>
-              <span class="preview__search-placeholder">Search logs…</span>
+      <div class="bg-surface border border-border rounded-xl overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.4)]">
+        <!-- toolbar -->
+        <div class="flex items-center justify-between px-4 py-3 border-b border-border gap-3 flex-wrap">
+          <div class="flex items-center gap-2 flex-wrap">
+            <div class="font-ui text-[13px] text-muted bg-elevated border border-border rounded-[5px] px-2.5 py-[5px]">All services</div>
+            <div class="font-ui text-[13px] text-muted bg-elevated border border-border rounded-[5px] px-2.5 py-[5px]">All levels</div>
+            <div class="flex items-center gap-1.5 bg-elevated border border-border rounded-[5px] px-2.5 py-[5px] min-w-[200px]">
+              <span class="text-muted text-base">⌕</span>
+              <span class="font-ui text-[13px] text-muted">Search logs…</span>
             </div>
           </div>
-          <div class="preview__live">
-            <span class="preview__live-dot" />
+          <div class="flex items-center gap-1.5 text-[13px] font-medium text-brand">
+            <span class="w-[7px] h-[7px] rounded-full bg-brand animate-pulse" />
             Live
           </div>
         </div>
 
-        <div class="preview__table-head">
+        <!-- table head -->
+        <div class="grid grid-log-cols gap-3 px-4 py-1.5 font-ui text-[11px] font-semibold tracking-[0.06em] uppercase text-muted border-b border-border bg-elevated">
           <span>Timestamp</span>
           <span>Level</span>
           <span>Service</span>
@@ -48,7 +53,8 @@ const rows = [
           <span>Meta</span>
         </div>
 
-        <div class="preview__rows">
+        <!-- rows -->
+        <div class="bg-surface">
           <LogRow
             v-for="(row, i) in rows"
             :key="i"
@@ -60,145 +66,7 @@ const rows = [
           />
         </div>
       </div>
+
     </div>
   </section>
 </template>
-
-<style scoped>
-.preview {
-  padding: 96px 24px;
-  background: var(--page);
-}
-
-.preview__inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 48px;
-}
-
-.preview__header {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-width: 540px;
-}
-
-.preview__eyebrow {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--brand);
-}
-
-.preview__title {
-  font-family: var(--font-ui);
-  font-size: clamp(28px, 3vw, 40px);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  color: var(--text);
-  line-height: 1.15;
-}
-
-.preview__sub {
-  font-size: 15px;
-  color: var(--muted);
-  line-height: 1.65;
-}
-
-.preview__window {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.4);
-}
-
-.preview__toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.preview__toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.preview__filter {
-  font-family: var(--font-ui);
-  font-size: 13px;
-  color: var(--muted);
-  background: var(--elevated);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-.preview__search {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--elevated);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 5px 10px;
-  min-width: 200px;
-}
-
-.preview__search-icon { color: var(--muted); font-size: 16px; }
-
-.preview__search-placeholder {
-  font-family: var(--font-ui);
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.preview__live {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--brand);
-}
-
-.preview__live-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--brand);
-  animation: pulse 2s ease infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.5; transform: scale(0.8); }
-}
-
-.preview__table-head {
-  display: grid;
-  grid-template-columns: 140px 60px 90px 1fr auto;
-  gap: 12px;
-  padding: 6px 16px;
-  font-family: var(--font-ui);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-  border-bottom: 1px solid var(--border);
-  background: var(--elevated);
-}
-
-.preview__rows { background: var(--surface); }
-</style>
