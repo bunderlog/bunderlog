@@ -1,0 +1,14 @@
+name = "bunderlog-ingest"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[queues.producers]]
+queue = "bunderlog-logs"
+binding = "QUEUE"
+
+[vars]
+MAX_BATCH_SIZE = "500"
+
+# Secrets (set via wrangler secret put):
+# LOG_TOKEN
