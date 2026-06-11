@@ -1,0 +1,21 @@
+{
+  "name": "@bunderlog/sdk",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "lint": "oxlint src",
+    "test": "CI=CI vitest --coverage"
+  },
+  "dependencies": {
+    "@bunderlog/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "4.1.8",
+    "oxlint": "latest",
+    "typescript": "~6.0.0",
+    "vitest": "^4.1.4"
+  }
+}
