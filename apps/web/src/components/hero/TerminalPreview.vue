@@ -40,7 +40,7 @@ onMounted(() => {
   }, 750)
 })
 
-onUnmounted(() => clearInterval(timer))
+onUnmounted(() => { clearInterval(timer) })
 </script>
 
 <template>
