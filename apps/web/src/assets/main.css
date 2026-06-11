@@ -1,0 +1,57 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --page:        #0F1117;
+  --surface:     #1A1A1A;
+  --elevated:    #242424;
+  --border:      #333333;
+  --text:        #EFEFEF;
+  --muted:       #888780;
+  --brand:       #1D9E75;
+  --brand-dark:  #0F6E56;
+  --brand-tint:  #E1F5EE;
+  --brand-deep:  #04342C;
+
+  --level-debug: #888780;
+  --level-info:  #5DCAA5;
+  --level-warn:  #EF9F27;
+  --level-error: #E24B4A;
+  --level-fatal: #F09595;
+
+  --font-ui:   'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+html {
+  background: var(--page);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+svg {
+  display: block;
+}
+
+button {
+  font-family: inherit;
+}

@@ -5,7 +5,7 @@
     "": {
       "name": "bunderlog",
       "dependencies": {
-        "turbo": "^2.9.16",
+        "turbo": "^2.9.18",
       },
       "devDependencies": {
         "@commitlint/config-conventional": "^21.0.2",
