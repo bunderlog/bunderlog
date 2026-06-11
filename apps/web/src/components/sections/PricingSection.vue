@@ -4,29 +4,22 @@ import PricingCard from '@/components/pricing/PricingCard.vue'
 </script>
 
 <template>
-  <section id="pricing" class="pricing">
-    <div class="pricing__inner">
-      <div class="pricing__header">
+  <section id="pricing" class="py-24 px-6 bg-page">
+    <div class="max-w-[1200px] mx-auto flex flex-col gap-12">
+
+      <div class="flex flex-col items-center gap-3">
         <SectionLabel text="Pricing" />
-        <SectionTitle align="center" style="font-size: clamp(28px, 3vw, 40px);">
-          Simple, honest pricing
-        </SectionTitle>
-        <p class="pricing__sub">Start free. Scale when you're ready.</p>
+        <SectionTitle align="center" class="text-section">Simple, honest pricing</SectionTitle>
+        <p class="text-base text-muted">Start free. Scale when you're ready.</p>
       </div>
 
-      <div class="pricing__grid">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start max-md:max-w-[440px] max-md:mx-auto">
         <PricingCard
           name="Hobby"
           price="Free"
           description="Everything you need for side projects and small services."
           cta="Start for free"
-          :features="[
-            '500k logs / day',
-            '30-day retention',
-            '1 service',
-            'Live tail',
-            'Full-text search',
-          ]"
+          :features="['500k logs / day', '30-day retention', '1 service', 'Live tail', 'Full-text search']"
         />
         <PricingCard
           name="Team"
@@ -35,68 +28,17 @@ import PricingCard from '@/components/pricing/PricingCard.vue'
           description="For teams shipping production services that need more headroom."
           cta="Get started"
           :highlighted="true"
-          :features="[
-            '5M logs / day',
-            '90-day retention',
-            'Unlimited services',
-            'Alerts & notifications',
-            'Team members (up to 5)',
-            'Priority support',
-          ]"
+          :features="['5M logs / day', '90-day retention', 'Unlimited services', 'Alerts & notifications', 'Team members (up to 5)', 'Priority support']"
         />
         <PricingCard
           name="Enterprise"
           price="Custom"
           description="Unlimited scale, custom SLA, and dedicated support for large organizations."
           cta="Contact us"
-          :features="[
-            'Unlimited logs',
-            'Custom retention',
-            'Unlimited services',
-            'SSO / RBAC',
-            'Custom SLA',
-            'Dedicated support',
-          ]"
+          :features="['Unlimited logs', 'Custom retention', 'Unlimited services', 'SSO / RBAC', 'Custom SLA', 'Dedicated support']"
         />
       </div>
+
     </div>
   </section>
 </template>
-
-<style scoped>
-.pricing {
-  padding: 96px 24px;
-  background: var(--page);
-}
-
-.pricing__inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 48px;
-}
-
-.pricing__header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.pricing__sub {
-  font-size: 16px;
-  color: var(--muted);
-}
-
-.pricing__grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  align-items: start;
-}
-
-@media (max-width: 900px) {
-  .pricing__grid { grid-template-columns: 1fr; max-width: 440px; margin: 0 auto; }
-}
-</style>

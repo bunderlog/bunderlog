@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { BaseButton } from '@/components/ui'
 
-defineProps<{
+const props = defineProps<{
   name: string
   price: string
   period?: string
@@ -11,106 +12,38 @@ defineProps<{
   ctaHref?: string
   highlighted?: boolean
 }>()
+
+const cardCls = computed(() => [
+  'bg-surface border rounded-[10px] p-7 flex flex-col gap-5',
+  props.highlighted ? 'border-brand shadow-brand-ring' : 'border-border',
+])
 </script>
 
 <template>
-  <div :class="['card', { 'card--highlighted': highlighted }]">
-    <div class="card__header">
-      <p class="card__name">{{ name }}</p>
-      <div class="card__price-row">
-        <span class="card__price">{{ price }}</span>
-        <span v-if="period" class="card__period">{{ period }}</span>
+  <div :class="cardCls">
+    <div class="flex flex-col gap-2">
+      <p :class="['text-[12px] font-semibold tracking-[0.1em] uppercase', highlighted ? 'text-brand' : 'text-muted']">
+        {{ name }}
+      </p>
+      <div class="flex items-baseline gap-1">
+        <span class="font-ui text-[36px] font-bold tracking-[-0.04em] text-fg">{{ price }}</span>
+        <span v-if="period" class="text-sm text-muted">{{ period }}</span>
       </div>
-      <p class="card__desc">{{ description }}</p>
+      <p class="text-sm text-muted leading-relaxed">{{ description }}</p>
     </div>
 
     <BaseButton
       :variant="highlighted ? 'primary' : 'secondary'"
       size="md"
       :href="ctaHref ?? '#'"
-      style="width: 100%; justify-content: center;"
-    >
-      {{ cta }}
-    </BaseButton>
+      class="w-full justify-center"
+    >{{ cta }}</BaseButton>
 
-    <ul class="card__features">
-      <li v-for="f in features" :key="f" class="card__feature">
-        <span class="card__check">✓</span>
+    <ul class="flex flex-col gap-2.5 list-none">
+      <li v-for="f in features" :key="f" class="flex items-start gap-2 text-sm text-fg leading-snug">
+        <span class="text-brand shrink-0 text-[13px] mt-px">✓</span>
         {{ f }}
       </li>
     </ul>
   </div>
 </template>
-
-<style scoped>
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.card--highlighted {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 1px var(--brand), 0 0 32px rgba(29, 158, 117, 0.1);
-}
-
-.card__header { display: flex; flex-direction: column; gap: 8px; }
-
-.card__name {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.card--highlighted .card__name { color: var(--brand); }
-
-.card__price-row { display: flex; align-items: baseline; gap: 4px; }
-
-.card__price {
-  font-family: var(--font-ui);
-  font-size: 36px;
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  color: var(--text);
-}
-
-.card__period {
-  font-size: 14px;
-  color: var(--muted);
-}
-
-.card__desc {
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.5;
-}
-
-.card__features {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.card__feature {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--text);
-  line-height: 1.4;
-}
-
-.card__check {
-  color: var(--brand);
-  flex-shrink: 0;
-  font-size: 13px;
-  margin-top: 1px;
-}
-</style>

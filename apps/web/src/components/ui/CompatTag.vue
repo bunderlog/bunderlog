@@ -3,33 +3,8 @@ defineProps<{ label: string }>()
 </script>
 
 <template>
-  <span class="compat">
-    <span class="compat__dot" />
+  <span class="inline-flex items-center gap-1.5 font-ui text-[13px] font-medium text-muted bg-elevated border border-border rounded-full px-3 py-1 whitespace-nowrap">
+    <span class="w-1.5 h-1.5 rounded-full bg-brand shrink-0" />
     {{ label }}
   </span>
 </template>
-
-<style scoped>
-.compat {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-ui);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
-  background: var(--elevated);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 4px 12px 4px 10px;
-  white-space: nowrap;
-}
-
-.compat__dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--brand);
-  flex-shrink: 0;
-}
-</style>

@@ -6,20 +6,13 @@ defineProps<{
 </script>
 
 <template>
-  <component :is="as ?? 'h2'" :class="['title', `title--${align ?? 'left'}`]">
+  <component
+    :is="as ?? 'h2'"
+    :class="[
+      'font-ui font-semibold tracking-[-0.03em] leading-[1.15] text-fg',
+      align === 'center' ? 'text-center' : 'text-left',
+    ]"
+  >
     <slot />
   </component>
 </template>
-
-<style scoped>
-.title {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-  color: var(--text);
-}
-
-.title--center { text-align: center; }
-.title--left   { text-align: left; }
-</style>

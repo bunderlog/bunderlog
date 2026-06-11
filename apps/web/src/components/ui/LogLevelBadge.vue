@@ -1,26 +1,20 @@
 <script setup lang="ts">
-defineProps<{ level: 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'FATAL' }>()
+const props = defineProps<{ level: 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'FATAL' }>()
+
+const CLASSES: Record<string, string> = {
+  DEBUG: 'text-debug bg-debug/10',
+  INFO:  'text-info  bg-info/10',
+  WARN:  'text-warn  bg-warn/10',
+  ERROR: 'text-error bg-error/10',
+  FATAL: 'text-fatal bg-fatal/[.15]',
+}
 </script>
 
 <template>
-  <span :class="['badge', `badge--${level.toLowerCase()}`]">{{ level }}</span>
+  <span
+    :class="[
+      'inline-block font-mono text-[10px] font-medium tracking-[0.04em] px-1.5 py-0.5 rounded-[3px] leading-[1.6]',
+      CLASSES[props.level],
+    ]"
+  >{{ level }}</span>
 </template>
-
-<style scoped>
-.badge {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  padding: 2px 6px;
-  border-radius: 3px;
-  line-height: 1.6;
-}
-
-.badge--debug { color: var(--level-debug); background: rgba(136, 135, 128, 0.12); }
-.badge--info  { color: var(--level-info);  background: rgba(93, 202, 165, 0.12);  }
-.badge--warn  { color: var(--level-warn);  background: rgba(239, 159, 39, 0.12);  }
-.badge--error { color: var(--level-error); background: rgba(226, 75, 74, 0.12);   }
-.badge--fatal { color: var(--level-fatal); background: rgba(240, 149, 149, 0.15); }
-</style>
