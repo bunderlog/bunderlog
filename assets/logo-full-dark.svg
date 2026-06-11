@@ -6,13 +6,13 @@
     </defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="Лого" transform="translate(-78, -183)" xlink:href="#path-1">
-            <g id="Group" stroke-width="1" transform="translate(139, 169)" font-family="HelveticaNeue, Helvetica Neue" font-size="63" font-weight="normal">
+            <g id="Group" transform="translate(139, 169)" font-family="HelveticaNeue, Helvetica Neue" font-size="63" font-weight="normal">
                 <text id="bunderlog">
                     <tspan x="0" y="60" fill="#EFEFEF">bunder</tspan>
                     <tspan x="199.584" y="60" fill="#1D9E75">log</tspan>
                 </text>
             </g>
-            <g id="Group" stroke-width="1" transform="translate(79, 184)">
+            <g id="Group" transform="translate(79, 184)">
                 <rect id="Rectangle" fill="#1D9E75" x="0" y="37" width="19" height="8"></rect>
                 <rect id="Rectangle" fill="#EFEFEF" x="0" y="0" width="45" height="8"></rect>
                 <rect id="Rectangle" fill="#888780" x="0" y="18.5" width="32" height="8"></rect>
