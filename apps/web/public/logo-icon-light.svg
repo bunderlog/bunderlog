@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="53px" height="53px" viewBox="0 0 53 53" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="64px" height="64px" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>logo-icon-light</title>
     <defs>
         <path d="M0,0 L495,0 L495,694 L0,694 L0,0 Z" id="path-1"></path>
     </defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Лого" transform="translate(-75, -42)" xlink:href="#path-1">
+        <g id="Лого" transform="translate(-69, -36)" xlink:href="#path-1">
             <g id="Group" transform="translate(79, 46)">
                 <rect id="Rectangle" fill="#1D9E75" x="0" y="37" width="19" height="8"></rect>
                 <rect id="Rectangle" fill="#1A1A1A" x="0" y="0" width="45" height="8"></rect>
