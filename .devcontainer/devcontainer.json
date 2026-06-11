@@ -7,6 +7,7 @@
   "customizations": {
     "vscode": {
       "settings": {
+        "github.copilot.chat.generateCommitMessage.enabled": false,
         "editor.fontFamily": "'JetBrains Mono', Consolas, 'Courier New', monospace",
         "editor.fontSize": 13,
         "editor.fontLigatures": true,
@@ -50,6 +51,8 @@
         }
       },
       "extensions": [
+        "anthropic.claude-code",
+        "juanlb.claude-commit",
         "cloudflare.cloudflare-workers-bindings-extension",
         "oxc.oxc-vscode",
         "streetsidesoftware.code-spell-checker",
@@ -60,7 +63,8 @@
   "mounts": [
     "source=${localEnv:HOME}/.ssh,target=/home/dev/.ssh,type=bind,consistency=cached",
     "source=/run/host-services/ssh-auth.sock,target=/ssh-agent.sock,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.zsh_history,target=/home/dev/.zsh_history,type=bind,consistency=cached"
+    "source=${localEnv:HOME}/.zsh_history,target=/home/dev/.zsh_history,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.claude,target=/home/dev/.claude,type=bind,consistency=cached"
   ],
   "forwardPorts": [5173],
   "portsAttributes": {
