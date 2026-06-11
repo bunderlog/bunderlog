@@ -379,6 +379,24 @@ Filtering is done only in `tools/merge-coverage.mjs` via the `COVERAGE_IGNORE` a
 
 ---
 
+## Development Workflow
+
+All development happens on the `next` branch. Never commit directly to `main`.
+
+```bash
+make next    # create/switch to next branch and push to origin
+# ... do work, commit ...
+# open PR on GitHub from next → main
+make merge   # pull main, merge next into main, push
+```
+
+1. `make next` — creates `next` branch (or switches to it if it exists) and tracks `origin/next`
+2. Do work and commit on `next`
+3. Open a PR on GitHub (`next` → `main`) and wait for CI
+4. `make merge` — merges `next` into `main` and pushes
+
+---
+
 ## Current Status and Next Steps
 
 ### Done
