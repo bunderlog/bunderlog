@@ -31,6 +31,12 @@ export interface IngestPayload {
   logs: IngestRecord[]
 }
 
+export interface QueueMessage extends IngestRecord {
+  ip: string | null
+  country: string | null
+  ray: string | null
+}
+
 export interface LogsQueryParams {
   service?: string
   level?: LogLevel
