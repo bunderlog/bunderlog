@@ -40,6 +40,10 @@ vi.mock('../src/App.vue', () => ({
   default: { name: 'App' },
 }))
 
+vi.mock('../src/composables/useTheme', () => ({
+  useTheme: vi.fn(() => ({ initTheme: vi.fn(), toggleTheme: vi.fn(), isDark: { value: true } })),
+}))
+
 vi.mock('../src/router', () => ({
   default: routerMock,
 }))
