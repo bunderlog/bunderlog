@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BrandLogo, BaseButton } from '@/components/ui'
+import { BrandLogo, BaseButton, ThemeToggle } from '@/components/ui'
 
 const links = [
   { href: '#features',     label: 'Features' },
@@ -24,6 +24,7 @@ const links = [
       </ul>
 
       <div class="flex items-center gap-1.5">
+        <ThemeToggle />
         <BaseButton variant="ghost" size="sm" href="#">Sign in</BaseButton>
         <BaseButton variant="primary" size="sm" href="#pricing">Get started</BaseButton>
       </div>
