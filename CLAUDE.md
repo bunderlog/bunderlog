@@ -30,6 +30,7 @@ bunderlog/
 │   ├── consumer/         # CF Worker — write to storage       [planned]
 │   └── query-api/        # CF Worker — REST API for dashboard [planned]
 ├── packages/
+│   ├── types/            # Shared TypeScript types            [planned]
 │   └── sdk/              # TypeScript SDK (Node.js + Browser) [planned]
 ├── tools/
 │   └── merge-coverage.mjs
@@ -228,8 +229,7 @@ await log.flush()
 
 ## Vue 3 — Modular Structure (dashboard + landing)
 
-> This is the target structure for `apps/web/`. Currently only a scaffold exists
-> (`App.vue`, `main.ts`, `router/`, `stores/`).
+> Landing page components are fully built. Dashboard components (`stores/`, remaining composables) are next.
 
 ```
 apps/web/src/
@@ -251,11 +251,12 @@ apps/web/src/
 │   ├── ui/                   # atomic components with no business logic
 │   │   ├── index.ts          # mandatory barrel export
 │   │   ├── BaseButton.vue
+│   │   ├── BrandLogo.vue     # switches dark/light src based on useTheme
+│   │   ├── CompatTag.vue
+│   │   ├── LogLevelBadge.vue
 │   │   ├── SectionLabel.vue
 │   │   ├── SectionTitle.vue
-│   │   ├── LogLevelBadge.vue
-│   │   ├── CompatTag.vue
-│   │   └── BrandLogo.vue
+│   │   └── ThemeToggle.vue
 │   ├── hero/
 │   │   ├── TerminalPreview.vue
 │   │   └── CtaButtons.vue
@@ -266,11 +267,12 @@ apps/web/src/
 │       ├── StepCard.vue
 │       └── LogRow.vue
 ├── composables/              # all files must start with 'use'
-│   ├── useLiveTail.ts
-│   ├── useLogSearch.ts
-│   └── useScrollFade.ts
+│   ├── useTheme.ts           # dark/light toggle, module-level singleton
+│   ├── useLiveTail.ts        # [planned] SSE log tail
+│   ├── useLogSearch.ts       # [planned] debounced search
+│   └── useScrollFade.ts      # [planned] scroll animation
 ├── stores/
-│   └── logsStore.ts
+│   └── logsStore.ts          # [planned]
 └── App.vue
 ```
 
@@ -386,13 +388,15 @@ Filtering is done only in `tools/merge-coverage.mjs` via the `COVERAGE_IGNORE` a
 - [x] Design system (colors, typography, logo)
 - [x] Coverage pipeline with Codacy
 - [x] Devcontainer for monorepo
+- [x] Landing page — all Vue 3 components built (sections, ui, hero, features, pricing)
+- [x] Tailwind CSS v4 migration (`@tailwindcss/vite`, CSS-first `@theme`)
+- [x] Dark/light theme system (`useTheme`, `ThemeToggle`, `html.light` CSS variable overrides)
+- [x] `BrandLogo` switches between dark/light SVG assets based on active theme
 
 ### Next Steps (priority)
 
-1. Landing page — Vue 3 components starting with `ui/` atomics
-2. Ingest Worker — basic implementation
-3. Consumer Worker — basic implementation
-4. Query API Worker — basic implementation
-5. TypeScript SDK — basic implementation
-6. Landing page — HTML prototype with inline styles
-7. Decomposition into Vue 3 components (target structure defined)
+1. `packages/types` — shared TypeScript types (`LogEntry`, `LogLevel`, `IngestPayload`)
+2. `apps/ingest` — CF Worker: auth, validation, geo-enrichment, rate limiting, queue
+3. `apps/consumer` — CF Worker: D1 insert, R2 archive, KV counters
+4. `apps/query-api` — CF Worker: REST API with cursor pagination and SSE tail
+5. `packages/sdk` — TypeScript SDK (Node.js + Browser)

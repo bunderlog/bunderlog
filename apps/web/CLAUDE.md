@@ -18,19 +18,20 @@ bun run test         # vitest with coverage (jsdom environment)
 
 ## Current State
 
-The app is a scaffold — only the bare minimum exists:
+Landing page is fully built. Dashboard is not started.
 
-- `src/App.vue` — placeholder template, no real content
-- `src/main.ts` — mounts the app
-- `src/router/index.ts` — router with empty routes array
-- `src/stores/counter.ts` — default Pinia example store (to be deleted)
-- `tests/main.test.ts` — minimal smoke test
+- `src/App.vue` — mounts `LandingLayout` with all sections
+- `src/main.ts` — calls `useTheme().initTheme()` before mount
+- `src/router/index.ts` — router with empty routes array (dashboard routes pending)
+- `src/components/` — all landing page components exist (sections, ui, hero, features, pricing)
+- `src/composables/useTheme.ts` — dark/light theme, module-level singleton
+- `tests/main.test.ts` — smoke test for main entrypoint
 
-No components, no composables, no real pages yet. The target structure is defined in the root `CLAUDE.md`.
+No stores, no dashboard components, no `useLiveTail` / `useLogSearch` / `useScrollFade` yet.
 
 ---
 
-## Target Structure
+## Structure
 
 ```
 src/
@@ -52,11 +53,12 @@ src/
 │   ├── ui/                   # atomic, no business logic
 │   │   ├── index.ts          # barrel export — mandatory
 │   │   ├── BaseButton.vue
+│   │   ├── BrandLogo.vue
+│   │   ├── CompatTag.vue
+│   │   ├── LogLevelBadge.vue
 │   │   ├── SectionLabel.vue
 │   │   ├── SectionTitle.vue
-│   │   ├── LogLevelBadge.vue
-│   │   ├── CompatTag.vue
-│   │   └── BrandLogo.vue
+│   │   └── ThemeToggle.vue
 │   ├── hero/
 │   │   ├── TerminalPreview.vue
 │   │   └── CtaButtons.vue
@@ -67,11 +69,12 @@ src/
 │       ├── StepCard.vue
 │       └── LogRow.vue
 ├── composables/              # filenames must start with 'use'
-│   ├── useLiveTail.ts
-│   ├── useLogSearch.ts
-│   └── useScrollFade.ts
+│   ├── useTheme.ts
+│   ├── useLiveTail.ts        # [planned]
+│   ├── useLogSearch.ts       # [planned]
+│   └── useScrollFade.ts      # [planned]
 ├── stores/
-│   └── logsStore.ts
+│   └── logsStore.ts          # [planned]
 └── App.vue
 ```
 
@@ -123,5 +126,5 @@ src/
 
 - Vue 3 **beta channel** — all `@vue/*` packages pinned to `beta` via `overrides`
 - `@` alias resolves to `src/`
-- No Chart.js or VueUse yet — add when building the dashboard, not before
-- `counter.ts` store is scaffolding — delete it when building real stores
+- No Chart.js or VueUse yet — add when building the dashboard
+- `stores/` and dashboard composables (`useLiveTail`, `useLogSearch`, `useScrollFade`) are next after backend is ready
