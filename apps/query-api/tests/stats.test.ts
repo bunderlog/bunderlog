@@ -1,84 +1,93 @@
 import { describe, expect, it, vi } from 'vitest'
 import { handleStats } from '../src/routes/stats'
 
-function makeKv(store: Record<string, string> = {}) {
-  return {
-    get: vi.fn(async (key: string) => store[key] ?? null),
-    list: vi.fn(async ({ prefix }: { prefix: string }) => ({
-      keys: Object.keys(store)
-        .filter((k) => k.startsWith(prefix))
-        .map((name) => ({ name })),
-      list_complete: true,
-    })),
+function makeDb(
+  total = 0,
+  levels: Array<{ level: string; n: number }> = [],
+  services: Array<{ service: string; n: number }> = [],
+) {
+  const stmts: Record<string, object> = {
+    'SELECT COUNT(*) AS n FROM logs': {
+      first: vi.fn(async () => ({ n: total })),
+    },
+    'SELECT level, COUNT(*) AS n FROM logs GROUP BY level': {
+      all: vi.fn(async () => ({ results: levels })),
+    },
+    'SELECT service, COUNT(*) AS n FROM logs GROUP BY service': {
+      all: vi.fn(async () => ({ results: services })),
+    },
   }
-}
-
-function makeDb(count = 0) {
-  const stmt = {
-    bind: vi.fn(),
-    first: vi.fn(async () => ({ n: count })),
-    all: vi.fn(async () => ({ results: [] })),
-  }
-  stmt.bind.mockReturnValue(stmt)
-  return { prepare: vi.fn(() => stmt) }
+  return { prepare: vi.fn((sql: string) => stmts[sql] ?? {}) }
 }
 
 describe('GET /stats', () => {
-  it('returns zeros when KV is empty and DB has no rows', async () => {
-    const res = await handleStats(makeDb() as never, makeKv() as never)
-    const body = (await res.json()) as { total: number }
+  it('returns zeros when DB is empty', async () => {
+    const res = await handleStats(makeDb() as never)
+    const body = (await res.json()) as {
+      total: number
+      byLevel: Record<string, number>
+      byService: Record<string, number>
+    }
     expect(body.total).toBe(0)
+    expect(body.byLevel['info']).toBe(0)
+    expect(body.byLevel['error']).toBe(0)
+    expect(Object.keys(body.byService)).toHaveLength(0)
   })
 
-  it('reads total from KV when available', async () => {
-    const kv = makeKv({ 'count:total': '42' })
-    const res = await handleStats(makeDb() as never, kv as never)
+  it('returns total from DB', async () => {
+    const res = await handleStats(makeDb(42) as never)
     const body = (await res.json()) as { total: number }
     expect(body.total).toBe(42)
   })
 
-  it('falls back to D1 COUNT for total when KV misses', async () => {
-    const db = makeDb(7)
-    const res = await handleStats(db as never, makeKv() as never)
-    const body = (await res.json()) as { total: number }
-    expect(body.total).toBe(7)
-  })
-
-  it('returns byLevel counts from KV', async () => {
-    const kv = makeKv({
-      'count:total': '5',
-      'count:level:info': '3',
-      'count:level:error': '2',
-    })
-    const res = await handleStats(makeDb() as never, kv as never)
+  it('returns byLevel counts from DB', async () => {
+    const res = await handleStats(
+      makeDb(5, [
+        { level: 'info', n: 3 },
+        { level: 'error', n: 2 },
+      ]) as never,
+    )
     const body = (await res.json()) as { byLevel: Record<string, number> }
     expect(body.byLevel['info']).toBe(3)
     expect(body.byLevel['error']).toBe(2)
     expect(body.byLevel['debug']).toBe(0)
   })
 
-  it('defaults byService count to 0 when KV get returns null for a listed key', async () => {
-    const kv = {
-      get: vi.fn(async () => null),
-      list: vi.fn(async ({ prefix }: { prefix: string }) => ({
-        keys: prefix.includes('service') ? [{ name: 'count:service:orphan' }] : [],
-        list_complete: true,
-      })),
-    }
-    const res = await handleStats(makeDb() as never, kv as never)
-    const body = (await res.json()) as { byService: Record<string, number> }
-    expect(body.byService['orphan']).toBe(0)
-  })
-
-  it('includes byService from KV list', async () => {
-    const kv = makeKv({
-      'count:total': '10',
-      'count:service:api': '6',
-      'count:service:payments': '4',
-    })
-    const res = await handleStats(makeDb() as never, kv as never)
+  it('returns byService counts from DB', async () => {
+    const res = await handleStats(
+      makeDb(
+        10,
+        [],
+        [
+          { service: 'api', n: 6 },
+          { service: 'payments', n: 4 },
+        ],
+      ) as never,
+    )
     const body = (await res.json()) as { byService: Record<string, number> }
     expect(body.byService['api']).toBe(6)
     expect(body.byService['payments']).toBe(4)
+  })
+
+  it('handles null total gracefully', async () => {
+    const stmts: Record<string, object> = {
+      'SELECT COUNT(*) AS n FROM logs': { first: vi.fn(async () => null) },
+      'SELECT level, COUNT(*) AS n FROM logs GROUP BY level': {
+        all: vi.fn(async () => ({ results: [] })),
+      },
+      'SELECT service, COUNT(*) AS n FROM logs GROUP BY service': {
+        all: vi.fn(async () => ({ results: [] })),
+      },
+    }
+    const db = { prepare: vi.fn((sql: string) => stmts[sql] ?? {}) }
+    const res = await handleStats(db as never)
+    const body = (await res.json()) as { total: number }
+    expect(body.total).toBe(0)
+  })
+
+  it('returns all five log levels in byLevel', async () => {
+    const res = await handleStats(makeDb() as never)
+    const body = (await res.json()) as { byLevel: Record<string, number> }
+    expect(Object.keys(body.byLevel)).toEqual(['debug', 'info', 'warn', 'error', 'fatal'])
   })
 })

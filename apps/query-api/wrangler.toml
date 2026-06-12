@@ -6,11 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "bunderlog"
-database_id = "placeholder"
-
-[[kv_namespaces]]
-binding = "COUNTERS"
-id = "placeholder"
+database_id = "97052d55-57e2-40f7-b099-25596b1a0802"
 
 [vars]
 WEB_ORIGIN = "https://bunderlog.dev"

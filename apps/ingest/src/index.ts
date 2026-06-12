@@ -1,8 +1,9 @@
-import type { IngestRecord } from '@bunderlog/types'
+import type { QueueMessage } from '@bunderlog/types'
+import { insertBatch, toLogEntry } from './db'
 import { validatePayload } from './validate'
 
 interface Env {
-  QUEUE: Queue<IngestRecord>
+  DB: D1Database
   LOG_TOKEN: string
   MAX_BATCH_SIZE?: string
 }
@@ -15,7 +16,7 @@ function json(body: unknown, status: number): Response {
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     if (request.method !== 'POST') {
       return json({ error: 'Method not allowed', code: 'METHOD_NOT_ALLOWED' }, 405)
     }
@@ -45,16 +46,14 @@ export default {
     const { logs } = result.payload
     const cf = request.cf ?? {}
 
-    const messages = logs.map((log) => ({
-      body: {
-        ...log,
-        ip: (cf['connectingIp'] as string | undefined) ?? null,
-        country: (cf['country'] as string | undefined) ?? null,
-        ray: request.headers.get('cf-ray') ?? null,
-      },
+    const messages: QueueMessage[] = logs.map((log) => ({
+      ...log,
+      ip: (cf['connectingIp'] as string | undefined) ?? null,
+      country: (cf['country'] as string | undefined) ?? null,
+      ray: request.headers.get('cf-ray') ?? null,
     }))
 
-    await env.QUEUE.sendBatch(messages)
+    ctx.waitUntil(insertBatch(env.DB, messages.map(toLogEntry)))
 
     return json({ accepted: messages.length }, 202)
   },

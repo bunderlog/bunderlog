@@ -10,10 +10,6 @@ function makeEnv() {
   stmt.bind.mockReturnValue(stmt)
   return {
     DB: { prepare: vi.fn(() => stmt) },
-    COUNTERS: {
-      get: vi.fn(async () => null),
-      list: vi.fn(async () => ({ keys: [], list_complete: true })),
-    },
     WEB_ORIGIN: 'https://bunderlog.dev',
   }
 }

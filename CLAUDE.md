@@ -26,12 +26,11 @@ everything and never forget) + `be under log`
 bunderlog/
 ├── apps/
 │   ├── web/              # Vue 3 + Vite → deploy to CF Pages  (exists)
-│   ├── ingest/           # CF Worker — log ingestion          [planned]
-│   ├── consumer/         # CF Worker — write to storage       [planned]
-│   └── query-api/        # CF Worker — REST API for dashboard [planned]
+│   ├── ingest/           # CF Worker — ingest + write storage (exists)
+│   └── query-api/        # CF Worker — REST API for dashboard (exists)
 ├── packages/
-│   ├── types/            # Shared TypeScript types            [planned]
-│   └── sdk/              # TypeScript SDK (Node.js + Browser) [planned]
+│   ├── types/            # Shared TypeScript types            (exists)
+│   └── sdk/              # TypeScript SDK (Node.js + Browser) (exists)
 ├── tools/
 │   └── merge-coverage.mjs
 ├── turbo.json
@@ -47,10 +46,11 @@ bunderlog/
 
 - **Cloudflare Workers** — all server-side components (not Node.js runtime)
 - **Cloudflare D1** — SQLite on the edge, hot log storage (30 days)
-- **Cloudflare R2** — object storage, raw NDJSON archive (forever)
-- **Cloudflare Queues** — buffer between ingest and consumer
-- **Cloudflare KV** — aggregates and counters (TTL 60s)
 - **Cloudflare Pages** — dashboard hosting
+
+> No Queues, no KV, no R2. All three require either a paid plan or a credit card on file
+> with no hard usage cap. D1 direct writes give 100k rows/day free with a hard stop — no
+> surprise charges possible.
 
 ### Frontend
 
@@ -88,22 +88,17 @@ Source (backend / browser / CF Tail Worker)
 Ingest Worker
   — auth via X-Log-Token (env secret)
   — schema validation (service, level, message required)
-  — geo-enrichment: ip, country, colo, ray (from request.cf)
-  — rate limiting (CF RateLimiter binding)
+  — geo-enrichment: ip, country, ray (from request.cf)
   — batch: up to 500 records per request
-  ↓  Queue.sendBatch()
-CF Queues  (at-least-once, retry, DLQ)
-  ↓  batch consumer
-Consumer Worker
-  — batch parsing
-  — INSERT into D1 (prepared statements)
-  — write raw NDJSON to R2 (path: YYYY/MM/DD/HH.ndjson)
-  — increment counters in KV
+  — return 202 immediately
+  — ctx.waitUntil(): batch INSERT into D1 (prepared statements)
+  ↓
+D1 (hot storage, 30 days)
   ↓
 Query API Worker
   — GET /logs  (filters: service, level, from, to, q, cursor, limit)
   — GET /logs/:id  (permalink)
-  — GET /stats  (aggregates from KV)
+  — GET /stats  (COUNT queries direct from D1)
   — cursor-based pagination (not offset)
   ↓
 Dashboard (Vue 3 on CF Pages)
@@ -373,7 +368,7 @@ Filtering is done only in `tools/merge-coverage.mjs` via the `COVERAGE_IGNORE` a
 
 | Plan       | Price     | Limits                                                 |
 | ---------- | --------- | ------------------------------------------------------ |
-| Hobby      | Free      | 500k logs/day, 30d retention, 1 service                |
+| Hobby      | Free      | ~100k logs/day (D1 free write limit), 30d retention, 1 service |
 | Team       | $12/month | 5M logs/day, 90d retention, unlimited services, alerts |
 | Enterprise | Contact   | Unlimited, custom SLA, SSO/RBAC                        |
 
@@ -413,8 +408,8 @@ make merge   # pull main, merge next into main, push
 
 ### Next Steps (priority)
 
-1. `packages/types` — shared TypeScript types (`LogEntry`, `LogLevel`, `IngestPayload`)
-2. `apps/ingest` — CF Worker: auth, validation, geo-enrichment, rate limiting, queue
-3. `apps/consumer` — CF Worker: D1 insert, R2 archive, KV counters
-4. `apps/query-api` — CF Worker: REST API with cursor pagination and SSE tail
-5. `packages/sdk` — TypeScript SDK (Node.js + Browser)
+1. Rebuild devcontainer (Node.js 22 required for wrangler)
+2. ~~Provision D1~~ — done: `database_id = 97052d55-57e2-40f7-b099-25596b1a0802`
+3. Set ingest secret: `wrangler secret put LOG_TOKEN --name bunderlog-ingest`
+4. Push to `main` — CI applies D1 schema and deploys both Workers automatically
+5. Wire dashboard (`apps/web`) to query-api endpoint

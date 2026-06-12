@@ -1,14 +1,20 @@
 import { describe, expect, it, vi } from 'vitest'
+import { toLogEntry, insertBatch } from '../src/db'
 import worker from '../src/index'
+
+vi.mock('../src/db', () => ({
+  toLogEntry: vi.fn((msg) => ({ ...msg, id: 'mock-id', ingest_ts: 0, meta: null })),
+  insertBatch: vi.fn(async () => {}),
+}))
 
 const TEST_TOKEN = 'test-token-123'
 
-const mockQueue = { sendBatch: vi.fn(async () => {}) }
-
 const testEnv = {
   LOG_TOKEN: TEST_TOKEN,
-  QUEUE: mockQueue,
+  DB: {} as never,
 }
+
+const testCtx = { waitUntil: vi.fn() }
 
 function makeRequest(
   method: string,
@@ -25,12 +31,20 @@ function makeRequest(
 
 describe('POST /ingest', () => {
   it('returns 405 for non-POST requests', async () => {
-    const res = await worker.fetch(makeRequest('GET', '/ingest'), testEnv as never, {} as never)
+    const res = await worker.fetch(
+      makeRequest('GET', '/ingest'),
+      testEnv as never,
+      testCtx as never,
+    )
     expect(res.status).toBe(405)
   })
 
   it('returns 404 for unknown path', async () => {
-    const res = await worker.fetch(makeRequest('POST', '/unknown'), testEnv as never, {} as never)
+    const res = await worker.fetch(
+      makeRequest('POST', '/unknown'),
+      testEnv as never,
+      testCtx as never,
+    )
     expect(res.status).toBe(404)
   })
 
@@ -38,7 +52,7 @@ describe('POST /ingest', () => {
     const res = await worker.fetch(
       makeRequest('POST', '/ingest', { logs: [] }),
       testEnv as never,
-      {} as never,
+      testCtx as never,
     )
     expect(res.status).toBe(401)
   })
@@ -47,7 +61,7 @@ describe('POST /ingest', () => {
     const res = await worker.fetch(
       makeRequest('POST', '/ingest', { logs: [] }, { 'X-Log-Token': 'wrong' }),
       testEnv as never,
-      {} as never,
+      testCtx as never,
     )
     expect(res.status).toBe(401)
   })
@@ -60,7 +74,7 @@ describe('POST /ingest', () => {
         body: 'not-json',
       }),
       testEnv as never,
-      {} as never,
+      testCtx as never,
     )
     expect(res.status).toBe(400)
     const body = (await res.json()) as { code: string }
@@ -71,15 +85,15 @@ describe('POST /ingest', () => {
     const res = await worker.fetch(
       makeRequest('POST', '/ingest', { logs: [] }, { 'X-Log-Token': TEST_TOKEN }),
       testEnv as never,
-      {} as never,
+      testCtx as never,
     )
     expect(res.status).toBe(400)
     const body = (await res.json()) as { code: string }
     expect(body.code).toBe('VALIDATION_ERROR')
   })
 
-  it('returns 202 with accepted count and calls sendBatch', async () => {
-    mockQueue.sendBatch.mockClear()
+  it('returns 202 with accepted count and schedules storage via ctx.waitUntil', async () => {
+    testCtx.waitUntil.mockClear()
     const res = await worker.fetch(
       makeRequest(
         'POST',
@@ -88,16 +102,16 @@ describe('POST /ingest', () => {
         { 'X-Log-Token': TEST_TOKEN },
       ),
       testEnv as never,
-      {} as never,
+      testCtx as never,
     )
     expect(res.status).toBe(202)
     const body = (await res.json()) as { accepted: number }
     expect(body.accepted).toBe(1)
-    expect(mockQueue.sendBatch).toHaveBeenCalledOnce()
+    expect(testCtx.waitUntil).toHaveBeenCalledOnce()
   })
 
   it('attaches geo fields from request.cf', async () => {
-    mockQueue.sendBatch.mockClear()
+    vi.mocked(toLogEntry).mockClear()
     const req = Object.assign(
       makeRequest(
         'POST',
@@ -107,10 +121,26 @@ describe('POST /ingest', () => {
       ),
       { cf: { connectingIp: '1.2.3.4', country: 'US' } },
     )
-    await worker.fetch(req as never, testEnv as never, {} as never)
-    const [[messages]] = mockQueue.sendBatch.mock.calls as [
-      Array<Array<{ body: Record<string, unknown> }>>,
-    ]
-    expect(messages[0]?.body).toMatchObject({ ip: '1.2.3.4', country: 'US', ray: '123abc' })
+    await worker.fetch(req as never, testEnv as never, testCtx as never)
+    const [[msg]] = vi.mocked(toLogEntry).mock.calls as [[Record<string, unknown>]]
+    expect(msg).toMatchObject({ ip: '1.2.3.4', country: 'US', ray: '123abc' })
+  })
+
+  it('calls insertBatch with mapped entries', async () => {
+    vi.mocked(insertBatch).mockClear()
+    testCtx.waitUntil.mockClear()
+    await worker.fetch(
+      makeRequest(
+        'POST',
+        '/ingest',
+        { logs: [{ level: 'error', service: 'worker', message: 'boom' }] },
+        { 'X-Log-Token': TEST_TOKEN },
+      ),
+      testEnv as never,
+      testCtx as never,
+    )
+    const [promise] = testCtx.waitUntil.mock.calls[0] as [Promise<unknown>]
+    await promise
+    expect(insertBatch).toHaveBeenCalledOnce()
   })
 })

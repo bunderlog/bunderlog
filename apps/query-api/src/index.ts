@@ -5,7 +5,6 @@ import { handleTail } from './routes/tail'
 
 interface Env {
   DB: D1Database
-  COUNTERS: KVNamespace
   WEB_ORIGIN?: string
 }
 
@@ -38,7 +37,7 @@ export default {
     if (pathname === '/logs') {
       response = await handleLogs(request, env.DB)
     } else if (pathname === '/stats') {
-      response = await handleStats(env.DB, env.COUNTERS)
+      response = await handleStats(env.DB)
     } else if (pathname === '/tail') {
       response = handleTail(request, env.DB)
     } else if (pathname.startsWith('/logs/') && pathname.length > 6) {
