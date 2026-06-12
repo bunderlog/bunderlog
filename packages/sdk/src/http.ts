@@ -24,7 +24,7 @@ export async function postBatch(
       // network error — retry on next attempt
     }
     if (attempt < MAX_ATTEMPTS - 1) {
-      await new Promise<void>((r) => setTimeout(r, delay))
+      await new Promise<void>((r) => setTimeout(r, delay)).catch(() => {})
       delay *= 2
     }
   }
