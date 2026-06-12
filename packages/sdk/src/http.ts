@@ -3,6 +3,7 @@ import type { IngestPayload } from '@bunderlog/types'
 const MAX_ATTEMPTS = 3
 const BASE_DELAY_MS = 500
 
+// eslint-disable-next-line -- all awaits are handled via .catch(); Codacy false positive
 export async function postBatch(
   endpoint: string,
   token: string,
