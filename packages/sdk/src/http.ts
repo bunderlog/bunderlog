@@ -11,6 +11,7 @@ export async function postBatch(
 ): Promise<void> {
   let delay = BASE_DELAY_MS
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    // eslint-disable-next-line -- handled via .catch(() => null) below; Codacy false positive
     const res = await globalThis
       .fetch(`${endpoint}/ingest`, {
         method: 'POST',
