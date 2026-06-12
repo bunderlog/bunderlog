@@ -17,3 +17,6 @@ coverage/
 
 # Ignore VSCode files
 .vscode/
+
+# Ignore personal Claude Code overrides
+.claude/settings.local.json
