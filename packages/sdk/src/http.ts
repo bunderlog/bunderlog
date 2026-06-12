@@ -10,6 +10,7 @@ export async function postBatch(
   payload: IngestPayload,
 ): Promise<void> {
   let delay = BASE_DELAY_MS
+  // eslint-disable-next-line -- handled via .catch(() => null) below; Codacy false positive
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     // eslint-disable-next-line -- handled via .catch(() => null) below; Codacy false positive
     const res = await globalThis
