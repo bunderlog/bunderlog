@@ -57,6 +57,19 @@ describe('GET /stats', () => {
     expect(body.byLevel['debug']).toBe(0)
   })
 
+  it('defaults byService count to 0 when KV get returns null for a listed key', async () => {
+    const kv = {
+      get: vi.fn(async () => null),
+      list: vi.fn(async ({ prefix }: { prefix: string }) => ({
+        keys: prefix.includes('service') ? [{ name: 'count:service:orphan' }] : [],
+        list_complete: true,
+      })),
+    }
+    const res = await handleStats(makeDb() as never, kv as never)
+    const body = (await res.json()) as { byService: Record<string, number> }
+    expect(body.byService['orphan']).toBe(0)
+  })
+
   it('includes byService from KV list', async () => {
     const kv = makeKv({
       'count:total': '10',

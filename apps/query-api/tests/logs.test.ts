@@ -84,6 +84,20 @@ describe('GET /logs', () => {
     expect(sql).not.toContain('level = ?')
   })
 
+  it('applies from filter', async () => {
+    const db = makeDb([])
+    await handleLogs(req({ from: '1000' }), db as never)
+    const sql = (db.prepare.mock.calls[0] as [string])[0]
+    expect(sql).toContain('ts >= ?')
+  })
+
+  it('applies to filter', async () => {
+    const db = makeDb([])
+    await handleLogs(req({ to: '2000' }), db as never)
+    const sql = (db.prepare.mock.calls[0] as [string])[0]
+    expect(sql).toContain('ts <= ?')
+  })
+
   it('applies full-text search with LIKE', async () => {
     const db = makeDb([])
     await handleLogs(req({ q: 'timeout' }), db as never)
