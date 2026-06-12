@@ -38,6 +38,7 @@
           "commitlint",
           "commitlintrc",
           "consolas",
+          "juanlb",
           "molyuk",
           "oxfmt",
           "oxlint",
@@ -52,10 +53,12 @@
       },
       "extensions": [
         "anthropic.claude-code",
-        "juanlb.claude-commit",
         "cloudflare.cloudflare-workers-bindings-extension",
+        "juanlb.claude-commit",
+        "ms-azuretools.vscode-containers",
         "oxc.oxc-vscode",
         "streetsidesoftware.code-spell-checker",
+        "vitest.explorer",
         "vue.volar"
       ]
     }
