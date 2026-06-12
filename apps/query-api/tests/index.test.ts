@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import worker from '../src/index'
 
 function makeEnv() {
@@ -58,8 +58,23 @@ describe('worker routing', () => {
     expect(res.status).toBe(404)
   })
 
+  it('routes GET /tail', async () => {
+    vi.spyOn(Date, 'now')
+      .mockReturnValueOnce(1000)
+      .mockReturnValue(1000 + 25_001)
+    const res = await worker.fetch(req('GET', '/tail'), makeEnv() as never)
+    expect(res.headers.get('Content-Type')).toBe('text/event-stream')
+    vi.restoreAllMocks()
+  })
+
   it('sets CORS headers on all responses', async () => {
     const res = await worker.fetch(req('GET', '/logs'), makeEnv() as never)
     expect(res.headers.get('Access-Control-Allow-Origin')).toBe('https://bunderlog.dev')
+  })
+
+  it('falls back to wildcard CORS origin when WEB_ORIGIN is not set', async () => {
+    const env = { ...makeEnv(), WEB_ORIGIN: undefined }
+    const res = await worker.fetch(req('GET', '/logs'), env as never)
+    expect(res.headers.get('Access-Control-Allow-Origin')).toBe('*')
   })
 })

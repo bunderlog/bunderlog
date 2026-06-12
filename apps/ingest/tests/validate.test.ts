@@ -74,6 +74,16 @@ describe('validatePayload', () => {
     expect('error' in r).toBe(true)
   })
 
+  it('rejects non-object entry in logs array', () => {
+    const r = validatePayload({ logs: ['a string', null, 42] })
+    expect('error' in r).toBe(true)
+  })
+
+  it('rejects missing message', () => {
+    const r = validatePayload({ logs: [{ level: 'info', service: 'api' }] })
+    expect('error' in r).toBe(true)
+  })
+
   it('rejects message longer than 4096 characters', () => {
     const r = validatePayload({
       logs: [{ level: 'info', service: 'api', message: 'x'.repeat(4097) }],
