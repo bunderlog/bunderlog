@@ -86,11 +86,21 @@ export function logger(config: LoggerConfig): Logger {
   }
 
   return {
-    debug: (m, meta) => push('debug', m, meta),
-    info: (m, meta) => push('info', m, meta),
-    warn: (m, meta) => push('warn', m, meta),
-    error: (m, meta) => push('error', m, meta),
-    fatal: (m, meta) => push('fatal', m, meta),
+    debug: (m, meta) => {
+      push('debug', m, meta)
+    },
+    info: (m, meta) => {
+      push('info', m, meta)
+    },
+    warn: (m, meta) => {
+      push('warn', m, meta)
+    },
+    error: (m, meta) => {
+      push('error', m, meta)
+    },
+    fatal: (m, meta) => {
+      push('fatal', m, meta)
+    },
     flush,
   }
 }

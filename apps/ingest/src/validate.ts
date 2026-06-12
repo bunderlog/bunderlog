@@ -36,9 +36,7 @@ export function validatePayload(body: unknown): { payload: IngestPayload } | { e
   const valid: IngestRecord[] = []
   const errors: ValidationError[] = []
 
-  for (let i = 0; i < logs.length; i++) {
-    const entry = logs[i]
-
+  for (const [i, entry] of logs.entries()) {
     if (typeof entry !== 'object' || entry === null) {
       errors.push({ index: i, field: 'entry', message: 'Must be an object' })
       continue
