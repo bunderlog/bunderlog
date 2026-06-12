@@ -11,7 +11,7 @@ function archivePath(ts: number): string {
 
 export async function archiveBatch(bucket: R2Bucket, entries: LogEntry[]): Promise<void> {
   if (entries.length === 0) return
-  const ts = entries[0]!.ingest_ts
+  const ts = Date.now()
   const ndjson = entries.map((e) => JSON.stringify(e)).join('\n')
   await bucket.put(archivePath(ts), ndjson, {
     httpMetadata: { contentType: 'application/x-ndjson' },

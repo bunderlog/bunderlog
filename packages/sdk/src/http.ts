@@ -20,8 +20,8 @@ export async function postBatch(
         body: JSON.stringify(payload),
       })
       if (res.ok || res.status < 500) return
-    } catch {
-      // network error — retry
+    } catch (_e) {
+      // network error — retry on next attempt
     }
     if (attempt < MAX_ATTEMPTS - 1) {
       await new Promise<void>((r) => setTimeout(r, delay))

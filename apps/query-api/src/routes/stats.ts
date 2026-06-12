@@ -27,6 +27,7 @@ export async function handleStats(db: D1Database, kv: KVNamespace): Promise<Resp
   for (const key of serviceKeys.keys) {
     const service = key.name.replace('count:service:', '')
     const val = await kv.get(key.name)
+    // eslint-disable-next-line security/detect-object-injection
     byService[service] = val ? parseInt(val, 10) : 0
   }
 
