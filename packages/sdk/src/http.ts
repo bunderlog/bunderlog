@@ -21,7 +21,7 @@ export async function postBatch(
           body: JSON.stringify(payload),
         })
         if (res.ok || res.status < 500) return
-      } catch (_e) {
+      } catch {
         // network error — retry on next attempt
       }
       if (attempt < MAX_ATTEMPTS - 1) {
@@ -29,7 +29,7 @@ export async function postBatch(
         delay *= 2
       }
     }
-  } catch (_e) {
+  } catch {
     // prevent unhandled rejection on unexpected errors
   }
 }
