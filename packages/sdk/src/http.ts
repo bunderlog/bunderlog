@@ -8,24 +8,28 @@ export async function postBatch(
   token: string,
   payload: IngestPayload,
 ): Promise<void> {
-  let delay = BASE_DELAY_MS
-  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    try {
-      const res = await globalThis.fetch(`${endpoint}/ingest`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Log-Token': token,
-        },
-        body: JSON.stringify(payload),
-      })
-      if (res.ok || res.status < 500) return
-    } catch (_e) {
-      // network error — retry on next attempt
+  try {
+    let delay = BASE_DELAY_MS
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      try {
+        const res = await globalThis.fetch(`${endpoint}/ingest`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Log-Token': token,
+          },
+          body: JSON.stringify(payload),
+        })
+        if (res.ok || res.status < 500) return
+      } catch (_e) {
+        // network error — retry on next attempt
+      }
+      if (attempt < MAX_ATTEMPTS - 1) {
+        await new Promise<void>((r) => setTimeout(r, delay)).catch(() => {})
+        delay *= 2
+      }
     }
-    if (attempt < MAX_ATTEMPTS - 1) {
-      await new Promise<void>((r) => setTimeout(r, delay)).catch(() => {})
-      delay *= 2
-    }
+  } catch (_e) {
+    // prevent unhandled rejection on unexpected errors
   }
 }
