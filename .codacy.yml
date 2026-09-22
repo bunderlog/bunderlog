@@ -1,8 +1,0 @@
-# .codacy.yml
-exclude_paths:
-  - schema.sql
-
-coverage:
-  includeFiles:
-    - '**/src/**/*.ts'
-    - '**/src/**/*.vue'
