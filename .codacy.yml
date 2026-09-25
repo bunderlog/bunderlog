@@ -1,0 +1,3 @@
+# SQLite migrations: Codacy's SQL rules are for T-SQL and don't apply.
+exclude_paths:
+  - 'migrations/**'

@@ -42,7 +42,7 @@ function beta(a: number, b: number) {
 
 /** Probability that each arm has the highest true conversion rate (Beta-Binomial, uniform prior). */
 export function probabilityBest(arms: { successes: number; n: number }[], draws = 20000): number[] {
-  const wins = arms.map(() => 0)
+  const wins = new Map<number, number>()
   for (let d = 0; d < draws; d++) {
     let best = -1
     let bestIdx = 0
@@ -54,9 +54,9 @@ export function probabilityBest(arms: { successes: number; n: number }[], draws 
         bestIdx = i
       }
     })
-    wins[bestIdx]++
+    wins.set(bestIdx, (wins.get(bestIdx) ?? 0) + 1)
   }
-  return wins.map((w) => w / draws)
+  return arms.map((_, i) => (wins.get(i) ?? 0) / draws)
 }
 
 /** Visitors per arm to tell p1 from p2 apart (two-sided α=0.05, power 80%). */

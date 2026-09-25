@@ -32,6 +32,7 @@ const data = ref<Stats | null>(null)
 const loading = ref(false)
 const error = ref('')
 
+const LABELS = new Map(Object.entries(COPY).map(([v, c]) => [v, c.label]))
 const letter = (v: Variant) => v.toUpperCase()
 const pct = (x: number, digits = 1) => `${(x * 100).toFixed(digits)}%`
 
@@ -54,7 +55,7 @@ async function load() {
     const qs = new URLSearchParams({ assign: filters.assign })
     if (filters.from) qs.set('from', filters.from)
     if (filters.source) qs.set('source', filters.source)
-    data.value = await (await authed(`/api/stats?${qs}`)).json()
+    data.value = await (await authed(`/api/stats?${qs.toString()}`)).json()
   } catch (e) {
     error.value = (e as Error).message
   } finally {
@@ -65,7 +66,7 @@ async function load() {
 function saveToken() {
   token.value = tokenInput.value.trim()
   storage.set('bl_stats_token', token.value)
-  load()
+  void load()
 }
 
 async function exportCsv() {
@@ -87,7 +88,7 @@ const rows = computed(() => {
   const best = probabilityBest(vs.map((v) => ({ successes: v.signups, n: v.visitors })))
   return vs.map((v, i) => ({
     ...v,
-    label: COPY[v.variant].label,
+    label: LABELS.get(v.variant) ?? v.variant,
     ci: wilson(v.signups, v.visitors),
     engagedRate: v.visitors ? v.engaged / v.visitors : 0,
     pBest: best[i],
@@ -134,8 +135,9 @@ const verdict = computed(() => {
 const sourceRows = computed(() => {
   const map = new Map<string, Record<string, { visitors: number; signups: number }>>()
   for (const s of data.value?.sources ?? []) {
-    if (!map.has(s.source)) map.set(s.source, {})
-    map.get(s.source)![s.variant] = { visitors: s.visitors, signups: s.signups }
+    const row = map.get(s.source) ?? {}
+    row[s.variant] = { visitors: s.visitors, signups: s.signups }
+    map.set(s.source, row)
   }
   return [...map.entries()]
     .map(([source, byVariant]) => ({
@@ -152,8 +154,7 @@ function answers(list: { variant: Variant; value: string; n: number }[] | null, 
 
 const tip = reactive({ show: false, x: 0, y: 0, row: null as (typeof rows.value)[number] | null })
 function showTip(e: MouseEvent | FocusEvent, row: (typeof rows.value)[number]) {
-  const el = e.currentTarget as HTMLElement
-  const box = el.getBoundingClientRect()
+  const box = (e.currentTarget as HTMLElement).getBoundingClientRect()
   const x = e instanceof MouseEvent ? e.clientX : box.left + box.width / 2
   tip.x = Math.min(x, window.innerWidth - 240)
   tip.y = box.top

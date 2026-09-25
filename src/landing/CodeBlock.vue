@@ -5,15 +5,15 @@ const props = defineProps<{ file: string; lang: 'python' | 'ts' | 'bash'; source
 
 type Token = { text: string; cls?: string }
 
-const COMMENT = { python: '#[^\\n]*', bash: '#[^\\n]*', ts: '//[^\\n]*' }
-const KEYWORDS = 'from|import|def|return|await|const|let|export|async|function'
-
 // Tiny highlighter: comments, strings, keywords, decorators and ENV_VARS — enough for three snippets.
+// Groups: 1 comment, 2 string, 3 keyword, 4 decorator, 5 env var; the two patterns differ only in the comment syntax.
+const HASH_COMMENTS =
+  /(#[^\n]*)|("(?:[^"\\\n]|\\.)*")|\b(from|import|def|return|await|const|let|export|async|function)\b|(@[\w.]+)(?=\()|^([A-Z][A-Z0-9_]+)(?==)/gm
+const SLASH_COMMENTS =
+  /(\/\/[^\n]*)|("(?:[^"\\\n]|\\.)*")|\b(from|import|def|return|await|const|let|export|async|function)\b|(@[\w.]+)(?=\()|^([A-Z][A-Z0-9_]+)(?==)/gm
+
 const tokens = computed<Token[]>(() => {
-  const re = new RegExp(
-    `(${COMMENT[props.lang]})|("(?:[^"\\\\\\n]|\\\\.)*")|\\b(${KEYWORDS})\\b|(@[\\w.]+)(?=\\()|^([A-Z][A-Z0-9_]+)(?==)`,
-    'gm',
-  )
+  const re = props.lang === 'ts' ? SLASH_COMMENTS : HASH_COMMENTS
   const out: Token[] = []
   let last = 0
   for (const m of props.source.matchAll(re)) {

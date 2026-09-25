@@ -19,7 +19,9 @@ onMounted(() => {
   }
   timer = window.setTimeout(step, 500)
 })
-onBeforeUnmount(() => clearTimeout(timer))
+onBeforeUnmount(() => {
+  clearTimeout(timer)
+})
 </script>
 
 <template>

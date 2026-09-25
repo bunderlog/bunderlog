@@ -46,7 +46,7 @@ it('counts visitors, signups and survey answers per variant, leaving out forced,
   await post('/api/waitlist', '{"email":"me@team.com","variant":"a","test":true}')
   await post('/api/waitlist', '{"email":"ad@click.com","variant":"c","visitor":"v4","forced":true,"source":"ads"}')
 
-  expect((await post('/api/profile', `{"token":"${token}","role":"AI / ML engineer","teamSize":"2–10","pain":"grep"}`)).status).toBe(200)
+  expect((await post('/api/profile', `{"token":"${String(token)}","role":"AI / ML engineer","teamSize":"2–10","pain":"grep"}`)).status).toBe(200)
   expect((await post('/api/profile', '{"token":"nope","role":"x"}')).status).toBe(404)
 
   const s = await getStats()
@@ -90,7 +90,7 @@ it('keeps stats and the export behind the token', async () => {
 
 it('neutralises spreadsheet formulas in the CSV export', async () => {
   const { body } = await post('/api/waitlist', '{"email":"x@y.com","variant":"a"}')
-  await post('/api/profile', `{"token":"${body.token}","pain":"=HYPERLINK(\\"http://evil\\")"}`)
+  await post('/api/profile', `{"token":"${String(body.token)}","pain":"=HYPERLINK(\\"http://evil\\")"}`)
 
   const res = await call('/api/export.csv', { headers: { authorization: 'Bearer secret' } })
   expect(res.headers.get('content-type')).toBe('text/csv; charset=utf-8')

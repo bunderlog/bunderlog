@@ -43,9 +43,13 @@ export interface Experiment {
   attribution: Attribution
 }
 
-function randomId(): string {
-  if (crypto.randomUUID) return crypto.randomUUID()
-  return Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join('')
+/** A uniformly random variant: masked bits with rejection, since modulo would favour the first variants slightly. */
+function randomVariant(): Variant {
+  const mask = 2 ** Math.ceil(Math.log2(VARIANTS.length)) - 1
+  for (;;) {
+    const x = crypto.getRandomValues(new Uint32Array(1))[0] & mask
+    if (x < VARIANTS.length) return VARIANTS[x]
+  }
 }
 
 function firstTouch(qs: URLSearchParams): Attribution {
@@ -93,7 +97,7 @@ export function initExperiment(): Experiment {
     variant = stored
     forced = storage.get('bl_forced') === '1'
   } else {
-    variant = VARIANTS[crypto.getRandomValues(new Uint32Array(1))[0] % VARIANTS.length]
+    variant = randomVariant()
     forced = false
   }
   storage.set('bl_v', variant)
@@ -101,7 +105,7 @@ export function initExperiment(): Experiment {
 
   let visitor = storage.get('bl_vid')
   if (!visitor) {
-    visitor = randomId()
+    visitor = crypto.randomUUID()
     storage.set('bl_vid', visitor)
   }
 
@@ -124,7 +128,7 @@ export function track(exp: Experiment, type: 'view' | 'engage') {
     ...exp.attribution,
   })
   // text/plain keeps the beacon a "simple" request with no CORS preflight.
-  if (!navigator.sendBeacon?.('/api/event', new Blob([body], { type: 'text/plain' }))) {
+  if (!navigator.sendBeacon('/api/event', new Blob([body], { type: 'text/plain' }))) {
     fetch('/api/event', { method: 'POST', body, keepalive: true }).catch(() => {})
   }
 }
