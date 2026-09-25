@@ -1,7 +1,0 @@
-export { default as BrandLogo } from './BrandLogo.vue'
-export { default as BaseButton } from './BaseButton.vue'
-export { default as SectionLabel } from './SectionLabel.vue'
-export { default as SectionTitle } from './SectionTitle.vue'
-export { default as LogLevelBadge } from './LogLevelBadge.vue'
-export { default as CompatTag } from './CompatTag.vue'
-export { default as ThemeToggle } from './ThemeToggle.vue'

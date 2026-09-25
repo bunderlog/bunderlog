@@ -1,415 +1,45 @@
-# CLAUDE.md — Bunderlog
+# bunderlog
 
-This file is read by Claude automatically at the start of every session.
-Update it when architectural decisions or priorities change.
+A positioning-experiment landing page: one page, three Variants (A/B/C) each carrying one Positioning, a waitlist and a token-protected `/stats` page that compares Conversion per Variant. The product itself is not built yet — this repo only answers "which positioning makes people sign up". Domain terms: `.about/glossary.md`.
 
----
+## Layout
 
-## What is Bunderlog
+Runs entirely on Cloudflare's free plan: static assets serve the pages, a Worker with D1 serves the API.
 
-A centralized log management system built entirely on the Cloudflare edge platform.
-No third-party paid services. The MVP fits within Cloudflare's free tier limits.
+- `index.html` (landing) and `stats.html` — the two Vite entries; `src/` holds their Vue code.
+  - `src/shared/copy.ts` — **all landing copy** for the three variants, plus `BRAND`/`DOMAIN`.
+  - `src/shared/experiment.ts` — variant assignment, visitor id, first-touch attribution, beacon tracking.
+  - `src/shared/variants.ts` — the variant list, shared with the Worker (which has no DOM).
+  - `src/landing/` — landing components; `src/stats/` — stats page and its math (Wilson interval, P(best), sample size).
+- `worker/index.ts` — `/api/event`, `/api/waitlist`, `/api/profile`, `/api/stats`, `/api/export.csv`, `/healthz`, validation. `worker/store.ts` — D1 queries.
+- `migrations/` — D1 schema. Change it with a new numbered file, never by editing an applied one.
+- `wrangler.jsonc` — bindings (`DB`, `EVENT_LIMIT`, `JOIN_LIMIT`), the `STATS_TOKEN` secret, and which paths run the Worker. `public/_headers` — CSP and caching for pages and assets.
 
-**Name:** `bunderlog` = `bundle + log` + bandarlog (Kipling's monkeys that see
-everything and never forget) + `be under log`
-
-**Reference:** Papertrail (https://betterstack.com/log-management) — simplicity, live tail, speed to value.
-**Competitor to analyze:** LogStream (https://logstream.tech/).
-
----
-
-## Monorepo — Structure
-
-> Apps marked `[planned]` do not yet exist in the repository.
-
-```
-bunderlog/
-├── apps/
-│   ├── web/              # Vue 3 + Vite → deploy to CF Pages  (exists)
-│   ├── ingest/           # CF Worker — ingest + write storage (exists)
-│   └── query-api/        # CF Worker — REST API for dashboard (exists)
-├── packages/
-│   ├── types/            # Shared TypeScript types            (exists)
-│   └── sdk/              # TypeScript SDK (Node.js + Browser) (exists)
-├── tools/
-│   └── merge-coverage.mjs
-├── turbo.json
-├── package.json          # root — Bun workspaces
-└── CLAUDE.md
-```
-
----
-
-## Tech Stack
-
-### Runtime and Deployment
-
-- **Cloudflare Workers** — all server-side components (not Node.js runtime)
-- **Cloudflare D1** — SQLite on the edge, hot log storage (30 days)
-- **Cloudflare Pages** — dashboard hosting
-
-> No Queues, no KV, no R2. All three require either a paid plan or a credit card on file
-> with no hard usage cap. D1 direct writes give 100k rows/day free with a hard stop — no
-> surprise charges possible.
-
-### Frontend
-
-- **Vue 3** (beta channel) with `<script setup>` and Composition API
-- **Vite 8** — bundler
-- **Pinia** — state management
-- **Vue Router 5** — navigation
-- **VueUse** — composable utilities
-- **Chart.js + vue-chartjs** — charts
-
-### Dev Tools
-
-- **Bun** — package manager and runtime for tooling
-- **Turborepo** — monorepo orchestration
-- **TypeScript 6** — everywhere, including Workers
-- **oxlint** — linter for `.ts` / `.js` files
-- **oxfmt** — formatter (replaces Prettier entirely)
-- **ESLint** — only for `*.vue` via `eslint-plugin-vue-modular`
-- **Vitest** — tests; Workers packages use `@cloudflare/vitest-pool-workers`
-- **husky + lint-staged** — pre-commit hooks
-
-### CI/CD and Quality
-
-- **GitHub Actions** — lint → test → deploy
-- **Codacy** — static analysis + coverage
-- **wrangler** — deploy Workers and manage CF resources
-
----
-
-## Data Flow Architecture
-
-```
-Source (backend / browser / CF Tail Worker)
-  ↓  POST /ingest  (header: X-Log-Token)
-Ingest Worker
-  — auth via X-Log-Token (env secret)
-  — schema validation (service, level, message required)
-  — geo-enrichment: ip, country, ray (from request.cf)
-  — batch: up to 500 records per request
-  — return 202 immediately
-  — ctx.waitUntil(): batch INSERT into D1 (prepared statements)
-  ↓
-D1 (hot storage, 30 days)
-  ↓
-Query API Worker
-  — GET /logs  (filters: service, level, from, to, q, cursor, limit)
-  — GET /logs/:id  (permalink)
-  — GET /stats  (COUNT queries direct from D1)
-  — cursor-based pagination (not offset)
-  ↓
-Dashboard (Vue 3 on CF Pages)
-  — log table with infinite scroll
-  — live tail via SSE (EventSource → GET /tail)
-  — filters, search with debounce
-  — Chart.js time-series widget
-```
-
----
-
-## D1 Schema
-
-```sql
-CREATE TABLE logs (
-  id         TEXT     PRIMARY KEY,  -- UUID v4
-  ts         INTEGER  NOT NULL,     -- Unix ms, from client
-  level      TEXT     NOT NULL,     -- debug|info|warn|error|fatal
-  service    TEXT     NOT NULL,     -- max 64 characters
-  message    TEXT     NOT NULL,     -- max 4096 characters
-  meta       TEXT,                  -- arbitrary JSON data
-  ip         TEXT,                  -- CF-Connecting-IP
-  country    TEXT,                  -- ISO 2-letter code
-  ray        TEXT,                  -- CF-Ray ID
-  ingest_ts  INTEGER  NOT NULL      -- Unix ms, time received by the system
-);
-
-CREATE INDEX idx_ts        ON logs(ts DESC);
-CREATE INDEX idx_level     ON logs(level);
-CREATE INDEX idx_service   ON logs(service);
-CREATE INDEX idx_svc_level ON logs(service, level, ts DESC);
-
--- Phase 2: full-text search
-CREATE VIRTUAL TABLE logs_fts USING fts5(message, service, content=logs);
-```
-
----
-
-## Node.js SDK — Interface
-
-```typescript
-import { logger } from 'bunderlog'
-
-const log = logger({
-  endpoint: 'https://ingest.bunderlog.dev',
-  token: process.env.LOG_TOKEN,
-  service: 'my-api',
-  batchSize: 20, // flush on size threshold
-  flushMs: 2000, // flush on timeout
-})
-
-log.debug('Cache miss', { key: 'user:42' })
-log.info('Server started', { port: 3000 })
-log.warn('Rate limit at 80%', { token: 'bnd_••••' })
-log.error('DB timeout', { duration_ms: 5000 })
-log.fatal('OOM — process terminating')
-
-// Graceful shutdown — call on SIGTERM
-await log.flush()
-```
-
----
-
-## Design System
-
-### Brand
-
-| Token              | Hex       |
-| ------------------ | --------- |
-| Primary green      | `#1D9E75` |
-| Green dark         | `#0F6E56` |
-| Green tint (light) | `#E1F5EE` |
-| Green deep (dark)  | `#04342C` |
-
-### Log Level Colors
-
-| Level | Hex                                        |
-| ----- | ------------------------------------------ |
-| DEBUG | `#888780` (grey)                           |
-| INFO  | `#5DCAA5` (green)                          |
-| WARN  | `#EF9F27` (amber)                          |
-| ERROR | `#E24B4A` (red)                            |
-| FATAL | `#F09595` (light red + background overlay) |
-
-### Dark Theme (default)
-
-| Token        | Hex       |
-| ------------ | --------- |
-| Page         | `#0F1117` |
-| Surface      | `#1A1A1A` |
-| Elevated     | `#242424` |
-| Border       | `#333333` |
-| Text primary | `#EFEFEF` |
-| Text muted   | `#888780` |
-| Brand / link | `#1D9E75` |
-
-### Light Theme
-
-| Token        | Hex       |
-| ------------ | --------- |
-| Page         | `#FFFFFF` |
-| Surface      | `#F7F7F5` |
-| Elevated     | `#EFEFED` |
-| Border       | `#D3D1C7` |
-| Text primary | `#1A1A1A` |
-| Text muted   | `#888780` |
-| Brand / link | `#1D9E75` |
-
-### Typography
-
-- **UI:** Geist Sans — navigation, headings, descriptions, buttons
-- **Data:** Geist Mono — timestamps, IP, Ray ID, log messages, code
-- **Rule:** never mix sans and mono within a single semantic block
-
-### Logo
-
-- Three horizontal lines of decreasing length, sharp corners (no border-radius)
-- Wordmark: `bunder` (weight 400, dark) + `log` (weight 400, `#1D9E75`)
-- Font: Geist / Inter, letter-spacing: -1px
-- No tagline
-
----
-
-## Vue 3 — Modular Structure (dashboard + landing)
-
-> Landing page components are fully built. Dashboard components (`stores/`, remaining composables) are next.
-
-```
-apps/web/src/
-├── components/
-│   ├── layout/
-│   │   └── LandingLayout.vue
-│   ├── sections/             # landing page sections (one file = one section)
-│   │   ├── AppNavbar.vue
-│   │   ├── HeroSection.vue
-│   │   ├── SocialProofBar.vue
-│   │   ├── FeaturesSection.vue
-│   │   ├── HowItWorksSection.vue
-│   │   ├── DashboardPreview.vue
-│   │   ├── CodeSection.vue
-│   │   ├── PricingSection.vue
-│   │   ├── NameStorySection.vue
-│   │   ├── CtaSection.vue
-│   │   └── AppFooter.vue
-│   ├── ui/                   # atomic components with no business logic
-│   │   ├── index.ts          # mandatory barrel export
-│   │   ├── BaseButton.vue
-│   │   ├── BrandLogo.vue     # switches dark/light src based on useTheme
-│   │   ├── CompatTag.vue
-│   │   ├── LogLevelBadge.vue
-│   │   ├── SectionLabel.vue
-│   │   ├── SectionTitle.vue
-│   │   └── ThemeToggle.vue
-│   ├── hero/
-│   │   ├── TerminalPreview.vue
-│   │   └── CtaButtons.vue
-│   ├── pricing/
-│   │   └── PricingCard.vue
-│   └── features/
-│       ├── FeatureCard.vue
-│       ├── StepCard.vue
-│       └── LogRow.vue
-├── composables/              # all files must start with 'use'
-│   ├── useTheme.ts           # dark/light toggle, module-level singleton
-│   ├── useLiveTail.ts        # [planned] SSE log tail
-│   ├── useLogSearch.ts       # [planned] debounced search
-│   └── useScrollFade.ts      # [planned] scroll animation
-├── stores/
-│   └── logsStore.ts          # [planned]
-└── App.vue
-```
-
-**Import rules:**
-
-- `@/components/ui` — always via `index.ts`, never directly (`@/components/ui/BaseButton.vue` — forbidden)
-- Cross-section imports — always via `@/` alias
-- Within the same folder — relative `./`
-
----
-
-## ESLint Configuration
-
-> `eslint.config.js` and `.oxlintrc.json` are not yet created. The configs below
-> are the intended target configuration.
-
-```javascript
-// eslint.config.js
-import vueModular from 'eslint-plugin-vue-modular'
-
-export default [
-  ...vueModular.configs.recommended,
-  {
-    files: ['**/*.vue'],
-    rules: {
-      'vue-modular/sfc-order': 'error',
-      'vue-modular/sfc-required': 'error',
-      'vue/component-tags-order': 'off', // conflicts with sfc-order
-    },
-  },
-]
-```
-
-```json
-// .oxlintrc.json
-{
-  "jsPlugins": ["eslint-plugin-vue-modular"],
-  "rules": {
-    "vue-modular/file-component-naming": "error",
-    "vue-modular/file-ts-naming": "error",
-    "vue-modular/folder-kebab-case": "error",
-    "vue-modular/shared-imports": "error",
-    "vue-modular/app-imports": "error",
-    "vue-modular/cross-imports-alias": "error",
-    "vue-modular/shared-ui-index-required": "error",
-    "vue-modular/stores-location": "error",
-    "vue-modular/views-suffix": "error",
-    "vue-modular/composable-filename-prefix": "error"
-  }
-}
-```
-
----
-
-## Coverage
+## Commands
 
 ```bash
-# Run tests with coverage across all packages
-bun run test:coverage
-
-# Merge lcov files into one (rewrites SF: paths to root-relative)
-bun run coverage:merge
-
-# Upload to Codacy
-bash <(curl -Ls https://coverage.codacy.com/get.sh) report \
-  -l JavaScript -r coverage/lcov.info
+npm run dev         # pages + Worker + local D1 with hot reload (needs .dev.vars and npm run db:migrate once)
+npm test            # Worker tests in the Workers runtime (npm run coverage: with coverage, as CI runs them)
+npm run build       # typecheck (app + worker) + vite build
 ```
 
-**Important:** CF Workers packages use `provider: 'istanbul'` (not `v8`).
-`v8` is incompatible with the `workerd` runtime.
+After changing `worker/`, run `npm test`; after any change, run `npm run build`. After changing `wrangler.jsonc`, `npm run typecheck` regenerates `worker-configuration.d.ts`.
 
-**Codacy:** `coverage.ignoreFiles` in `.codacy.yml` does not work for coverage.
-Filtering is done only in `tools/merge-coverage.mjs` via the `COVERAGE_IGNORE` array.
+## Rules that keep the experiment valid
 
----
+- Variants differ only in **copy**, never in layout or form — otherwise the test measures design, not positioning. New copy goes into `copy.ts`; components stay variant-agnostic.
+- A Visitor keeps their first Variant (`localStorage`). `?v=` assigns only new Visitors (Forced) and switches only Internal browsers; Forced traffic is excluded from the default A/B view. Don't change assignment or counting in a way that mixes the two.
+- `?notrack` makes a browser Internal: no events, Signups stored with `test = 1` and excluded from stats.
+- Conversion = Signups ÷ Visitors, where a Visitor is a distinct `visitor` id with a `view` event and a Signup counts only if its Visitor was seen. If you add an event type, keep that definition.
+- The Finish line (600 Visitors per Variant or 4 weeks) is fixed; don't move it or let `/stats` call a winner earlier.
+- Changing copy mid-test starts a new Period and restarts the Finish line — mention the `Since` filter to the user.
 
-## Related Repositories
+## Conventions
 
-| Repo                                                | Description                            |
-| --------------------------------------------------- | -------------------------------------- |
-| `github.com/bunderlog/bunderlog`                    | Main monorepo                          |
-| `github.com/andrewmolyuk/eslint-plugin-vue-modular` | ESLint plugin (author — project owner) |
-
-### eslint-plugin-vue-modular — Planned Improvements
-
-| Task                                                              | Priority |
-| ----------------------------------------------------------------- | -------- |
-| `no-direct-ui-import` — new rule                                  | P1       |
-| `allow` option for `service/store-filename-no-suffix`             | P2       |
-| `only` option for `components-index-required`                     | P2       |
-| Refactor `internal-imports-relative` → two rules                  | P2       |
-| Docs: conflict between `sfc-order` and `vue/component-tags-order` | P3       |
-| Docs: differences from FSD                                        | P3       |
-
----
-
-## Pricing (Planned)
-
-| Plan       | Price     | Limits                                                 |
-| ---------- | --------- | ------------------------------------------------------ |
-| Hobby      | Free      | ~100k logs/day (D1 free write limit), 30d retention, 1 service |
-| Team       | $12/month | 5M logs/day, 90d retention, unlimited services, alerts |
-| Enterprise | Contact   | Unlimited, custom SLA, SSO/RBAC                        |
-
----
-
-## Development Workflow
-
-All development happens on the `next` branch. Never commit directly to `main`.
-
-```bash
-make next    # create/switch to next branch and push to origin
-# ... do work, commit ...
-# open PR on GitHub from next → main
-make merge   # pull main, merge next into main, push
-```
-
-1. `make next` — creates `next` branch (or switches to it if it exists) and tracks `origin/next`
-2. Do work and commit on `next`
-3. Open a PR on GitHub (`next` → `main`) and wait for CI
-4. `make merge` — merges `next` into `main` and pushes
-
----
-
-## Current Status and Next Steps
-
-### Done
-
-- [x] Tech stack selected and justified
-- [x] Data flow architecture designed
-- [x] Design system (colors, typography, logo)
-- [x] Coverage pipeline with Codacy
-- [x] Devcontainer for monorepo
-- [x] Landing page — all Vue 3 components built (sections, ui, hero, features, pricing)
-- [x] Tailwind CSS v4 migration (`@tailwindcss/vite`, CSS-first `@theme`)
-- [x] Dark/light theme system (`useTheme`, `ThemeToggle`, `html.light` CSS variable overrides)
-- [x] `BrandLogo` switches between dark/light SVG assets based on active theme
-
-### Next Steps (priority)
-
-1. Rebuild devcontainer (Node.js 22 required for wrangler)
-2. ~~Provision D1~~ — done: `database_id = 97052d55-57e2-40f7-b099-25596b1a0802`
-3. Set ingest secret: `wrangler secret put LOG_TOKEN --name bunderlog-ingest`
-4. Push to `main` — CI applies D1 schema and deploys both Workers automatically
-5. Wire dashboard (`apps/web`) to query-api endpoint
+- Stay inside the free plan: pages and assets must not run the Worker (`run_worker_first` lists only the API), and each Worker request stays within 10 ms of CPU. Rate limits are per location and approximate.
+- The frontend is self-contained: no third-party scripts, fonts or analytics (CSP in `public/_headers` is `default-src 'self'`).
+- Colors come from CSS tokens in `src/shared/base.css`, with a dark-mode set; use tokens, not literal colors (only shadows and the dialog backdrop use `rgb()`).
+- TypeScript is pinned to 5.9: `vue-tsc` does not run on TypeScript 7 yet.
+- CSV export neutralises spreadsheet formulas; keep that when adding columns.
+- Commits follow Conventional Commits; git hooks reject AI co-author trailers.
+- `main` accepts changes only through pull requests with signed commits, linear history and green checks: CI (`.github/workflows/ci.yml`) uploads Worker test coverage to Codacy, whose static analysis and coverage checks are required.

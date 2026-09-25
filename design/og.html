@@ -1,0 +1,130 @@
+<!doctype html>
+<!--
+  Source of public/og.png, the link-preview image (1200×630). One image serves every variant,
+  so its text stays neutral across the three positionings. Re-render after editing:
+
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --hide-scrollbars \
+    --window-size=1200,630 --screenshot=public/og.png design/og.html
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: #060910;
+        color: #f4f5f7;
+        font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      .sheen {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(118deg, rgb(255 255 255 / 0.06) 0%, transparent 38%),
+          radial-gradient(ellipse 55% 45% at 50% 100%, rgb(246 112 20 / 0.22), transparent 70%);
+      }
+      .sun {
+        position: absolute;
+        left: 50%;
+        top: 452px;
+        width: 1500px;
+        aspect-ratio: 1;
+        translate: -50% 0;
+        border-radius: 50%;
+        border-top: 2px solid #fbc49f;
+        background: radial-gradient(circle at 50% 0%, rgb(246 112 20 / 0.75) 0%, rgb(246 112 20 / 0.32) 18%, rgb(40 14 4 / 0.6) 34%, #060910 55%);
+        box-shadow:
+          0 -30px 120px rgb(246 112 20 / 0.55),
+          0 -4px 30px rgb(246 112 20 / 0.55);
+      }
+      .content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding-top: 64px;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 34px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .word {
+        position: relative;
+      }
+      .word::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        right: -13px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #f67014;
+        box-shadow: 0 0 14px rgb(246 112 20 / 0.7);
+      }
+      h1 {
+        margin: 54px 0 0;
+        font-size: 76px;
+        font-weight: 500;
+        line-height: 1.04;
+        letter-spacing: -0.03em;
+      }
+      h1 em {
+        font-style: normal;
+        color: #ff8a4c;
+      }
+      p {
+        margin: 24px 0 0;
+        font-size: 28px;
+        color: #a5a7ae;
+      }
+      .pill {
+        position: absolute;
+        right: 48px;
+        bottom: 40px;
+        padding: 10px 20px;
+        border: 1px solid rgb(255 255 255 / 0.14);
+        border-radius: 999px;
+        background: rgb(6 9 16 / 0.55);
+        font-size: 22px;
+        font-weight: 600;
+        color: #f4f5f7;
+      }
+      .domain {
+        position: absolute;
+        left: 48px;
+        bottom: 46px;
+        font-size: 22px;
+        color: #a5a7ae;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sheen"></div>
+    <div class="sun"></div>
+    <div class="content">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true">
+          <rect x="2" y="4" width="20" height="4" rx="2" fill="#f4f5f7" />
+          <rect x="2" y="10" width="15" height="4" rx="2" fill="#f4f5f7" opacity=".45" />
+          <rect x="2" y="16" width="10" height="4" rx="2" fill="#f67014" />
+        </svg>
+        <span class="word">bunderlog</span>
+      </div>
+      <h1>A complete record of<br /><em>what really happened</em>.</h1>
+      <p>Logs, audit trails and AI agent runs — searchable and tamper-evident.</p>
+    </div>
+    <span class="domain">bunderlog.com</span>
+    <span class="pill">Early access · Join the waitlist</span>
+  </body>
+</html>
