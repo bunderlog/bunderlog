@@ -1,5 +1,5 @@
 // End-to-end through the Worker's fetch handler, against a local D1 with the real migrations.
-import { exports } from 'cloudflare:workers'
+import { env, exports } from 'cloudflare:workers'
 import { expect, it } from 'vitest'
 
 const BROWSER_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 Safari/605.1.15'
@@ -97,4 +97,35 @@ it('neutralises spreadsheet formulas in the CSV export', async () => {
   const csv = await res.text()
   expect(csv.split('\r\n')[0]).toBe('ts,email,variant,forced,test,source,medium,campaign,country,role,team_size,pain')
   expect(csv).toContain(`,x@y.com,a,0,0,direct,,,,,,"'=HYPERLINK(""http://evil"")"\r\n`)
+})
+
+it('counts only traffic since the chosen date', async () => {
+  await post('/api/event', '{"type":"view","variant":"b","visitor":"v1"}')
+  await post('/api/waitlist', '{"email":"b@example.com","variant":"b","visitor":"v1"}')
+  const today = new Date().toISOString().slice(0, 10)
+  const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10)
+
+  expect((await getStats(`from=${today}`)).variant('b')).toMatchObject({ visitors: 1, signups: 1 })
+  expect((await getStats(`from=${tomorrow}`)).variant('b')).toMatchObject({ visitors: 0, signups: 0 })
+  const bad = await call('/api/stats?from=yesterday', { headers: { authorization: 'Bearer secret' } })
+  expect(bad.status).toBe(400)
+})
+
+it('answers health checks and unknown paths', async () => {
+  const health = await call('/healthz')
+  expect(health.status).toBe(200)
+  expect(await health.text()).toBe('ok')
+  expect((await call('/api/nope')).status).toBe(404)
+  expect((await call('/api/stats', { method: 'POST' })).status).toBe(404)
+})
+
+it('answers a database failure with a generic error the form can fall back on', async () => {
+  await env.DB.exec('ALTER TABLE waitlist RENAME TO waitlist_off')
+  try {
+    const res = await post('/api/waitlist', '{"email":"x@y.com","variant":"a"}')
+    expect(res.status).toBe(500)
+    expect(res.body).toEqual({ ok: false, error: 'Something went wrong, please try again.' })
+  } finally {
+    await env.DB.exec('ALTER TABLE waitlist_off RENAME TO waitlist')
+  }
 })
