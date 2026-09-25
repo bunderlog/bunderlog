@@ -18,5 +18,12 @@ export default defineConfig(async () => ({
   test: {
     include: ['worker/**/*.test.ts'],
     setupFiles: ['./worker/test-setup.ts'],
+    // istanbul, because V8 coverage isn't available inside the Workers runtime; CI uploads the lcov report to Codacy.
+    coverage: {
+      provider: 'istanbul',
+      include: ['worker/**/*.ts'],
+      exclude: ['worker/**/*.test.ts', 'worker/test-*.ts'],
+      reporter: ['text-summary', 'lcov'],
+    },
   },
 }))

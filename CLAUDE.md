@@ -19,7 +19,7 @@ Runs entirely on Cloudflare's free plan: static assets serve the pages, a Worker
 
 ```bash
 npm run dev         # pages + Worker + local D1 with hot reload (needs .dev.vars and npm run db:migrate once)
-npm test            # Worker tests in the Workers runtime
+npm test            # Worker tests in the Workers runtime (npm run coverage: with coverage, as CI runs them)
 npm run build       # typecheck (app + worker) + vite build
 ```
 
@@ -42,3 +42,4 @@ After changing `worker/`, run `npm test`; after any change, run `npm run build`.
 - TypeScript is pinned to 5.9: `vue-tsc` does not run on TypeScript 7 yet.
 - CSV export neutralises spreadsheet formulas; keep that when adding columns.
 - Commits follow Conventional Commits; git hooks reject AI co-author trailers.
+- `main` accepts changes only through pull requests with signed commits, linear history and green checks: CI (`.github/workflows/ci.yml`) uploads Worker test coverage to Codacy, whose static analysis and coverage checks are required.

@@ -8,7 +8,8 @@
     "typecheck": "wrangler types && vue-tsc --noEmit && tsc --noEmit -p tsconfig.worker.json",
     "test": "vitest run",
     "db:migrate": "wrangler d1 migrations apply bunderlog --local",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "vue": "^3.5.43"
@@ -17,6 +18,7 @@
     "@cloudflare/vite-plugin": "^1.60.1",
     "@cloudflare/vitest-plugin": "^1.2.7",
     "@vitejs/plugin-vue": "^6.0.9",
+    "@vitest/coverage-istanbul": "^4.1.11",
     "typescript": "~5.9.3",
     "vite": "^8.3.1",
     "vitest": "^4.1.11",
