@@ -1,0 +1,30 @@
+{
+  "name": "bunderlog",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run typecheck && vite build",
+    "typecheck": "wrangler types && vue-tsc --noEmit && tsc --noEmit -p tsconfig.worker.json",
+    "test": "vitest run",
+    "db:migrate": "wrangler d1 migrations apply bunderlog --local",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "dependencies": {
+    "vue": "^3.5.43"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.60.1",
+    "@cloudflare/vitest-plugin": "^1.2.7",
+    "@vitejs/plugin-vue": "^6.0.9",
+    "typescript": "~5.9.3",
+    "vite": "^8.3.1",
+    "vitest": "^4.1.11",
+    "vue-tsc": "^3.3.11",
+    "wrangler": "^4.140.0"
+  },
+  "allowScripts": {
+    "workerd@1.20260923.1": true,
+    "esbuild@0.28.1": true
+  }
+}
