@@ -31,7 +31,7 @@ Stack: **Vue 3 + TypeScript + Vite** (landing and `/stats`) and a **Cloudflare W
 
 `/stats` asks for the token (`STATS_TOKEN`) and shows:
 - conversion per variant with a 95% confidence interval (Wilson) and the probability that each variant is best (Bayesian, Beta-Binomial);
-- a verdict: whether there is a winner yet, or how many more visitors are needed;
+- progress toward the finish line (600 visitors per variant or 4 weeks, whichever comes first) and, once it's reached, the verdict;
 - a breakdown by traffic source, the survey answers and a CSV export of the waitlist.
 
 ## Running locally
@@ -59,15 +59,17 @@ The rate limits (6 signups and 120 events a minute per IP) are counted per Cloud
 
 ## Driving traffic so the comparison is fair
 
+Links, ready-to-use texts and the search test: [TRAFFIC.md](TRAFFIC.md).
+
 1. **For the A/B test, link to the site root without `?v=`.** Only then is every source split evenly between the variants. Tag each source with UTM parameters: `/?utm_source=reddit&utm_campaign=r-devops`.
 2. **Sources:** Reddit (r/devops, r/SaaS, r/LocalLLaMA, r/AI_Agents), Hacker News, LinkedIn and X, dev chats and Discord communities, direct messages to CTOs you know. For speed, add $300–500 of paid ads (Reddit or LinkedIn Ads) with broad targeting, pointing at the site root.
-3. **Volume:** a large difference (say 5% vs 2%) needs about 600 visitors per variant; 5% vs 3% about 1,500; 3% vs 2% about 3,800. The `/stats` page tells you how many more are needed at the current rates.
+3. **Volume:** the finish line is 600 visitors per variant or 4 weeks, whichever comes first; decide from the numbers only then. 600 is enough to see a large difference (say 5% vs 2%); 5% vs 3% would need about 1,500 and 3% vs 2% about 3,800, so a close race ends in "no clear winner" and the survey and interviews decide.
 4. **Separately**, if you want to test a variant on "its own" audience (for example, A in AI communities), use `?v=a`. Look at that data through the "Forced" filter and don't mix it into the A/B.
 5. **Look beyond conversion.** Who signs up (roles, team size) and what they write in "how do you handle this today" is material for interviews. Reach out to the first 10–20 signups.
 
 ## Changing the name or the copy
 
-All copy lives in [src/shared/copy.ts](src/shared/copy.ts). The name and domain are the `BRAND` and `DOMAIN` constants at the top of that file. The name is also hardcoded in `index.html` (placeholder title, description and noscript text with the contact email). The icon is in `src/landing/LogoMark.vue`, with a static copy in `public/favicon.svg`. Internal names (Worker, D1 database, CSV file name) don't need to change.
+All copy lives in [src/shared/copy.ts](src/shared/copy.ts). The name and domain are the `BRAND` and `DOMAIN` constants at the top of that file. The name is also hardcoded in `index.html` (placeholder title, description, link-preview tags and noscript text with the contact email) and in the link-preview image: edit `design/og.html` and re-render `public/og.png` with the command at its top. The icon is in `src/landing/LogoMark.vue`, with a static copy in `public/favicon.svg`. Internal names (Worker, D1 database, CSV file name) don't need to change.
 
 If you change the copy of a test that is already running, start a new period: `/stats` has a "Since" filter.
 
