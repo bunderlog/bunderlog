@@ -14,7 +14,7 @@ Stack: **Vue 3 + TypeScript + Vite** (landing and `/stats`) and a **Cloudflare W
 ## How the experiment works
 
 - A new visitor is randomly assigned variant A, B or C. The variant is kept in `localStorage`, so a returning visitor sees the same one.
-- Two events are recorded: `view` (a unique visitor) and `engage` (focusing the email field or clicking a CTA). A waitlist signup is the conversion.
+- Two events are recorded: `view` (a unique visitor) and `engage` (focusing the email field or clicking a CTA). Conversion is signups ÷ visitors, and a signup counts only if its visitor sent a `view`.
 - The traffic source comes from the first touch: `utm_source`, `?ref=` or the referrer's domain.
 - After signing up, visitors get an optional survey: role, team size and "how do you handle this today?". The question is different for each variant.
 - Bots are filtered out of the events by User-Agent. The form is protected by a honeypot and a per-IP rate limit.
@@ -55,16 +55,23 @@ It is live at https://bunderlog.com (and `www.`), with the D1 database `bunderlo
 
 `npm run deploy` ships a new version. A new migration in `migrations/` goes out with `npx wrangler d1 migrations apply bunderlog --remote` before the deploy. Logs: `npx wrangler tail` or the Worker's Observability tab. A backup: `npx wrangler d1 export bunderlog --remote --output backup.sql`. A new stats token: `openssl rand -hex 24 | npx wrangler secret put STATS_TOKEN`.
 
+A deletion request (the footer promises one via `hello@`): erase the person's details but keep the anonymous row, so Conversion doesn't change after the fact:
+
+```bash
+npx wrangler d1 execute bunderlog --remote --command \
+  "UPDATE waitlist SET email = 'erased-' || token, pain = NULL WHERE email = 'person@example.com'"
+```
+
 The rate limits (6 signups and 120 events a minute per IP) are counted per Cloudflare location and are approximate: enough to stop a script, not an exact count.
 
 ## Driving traffic so the comparison is fair
 
-Links, ready-to-use texts and the search test: [TRAFFIC.md](TRAFFIC.md).
+Where to post, tagged links per source, ready-to-use texts and the search test are in [TRAFFIC.md](TRAFFIC.md). The rules that keep the comparison fair:
 
-1. **For the A/B test, link to the site root without `?v=`.** Only then is every source split evenly between the variants. Tag each source with UTM parameters: `/?utm_source=reddit&utm_campaign=r-devops`.
-2. **Sources:** Reddit (r/devops, r/SaaS, r/LocalLLaMA, r/AI_Agents), Hacker News, LinkedIn and X, dev chats and Discord communities, direct messages to CTOs you know. For speed, add $300–500 of paid ads (Reddit or LinkedIn Ads) with broad targeting, pointing at the site root.
-3. **Volume:** the finish line is 600 visitors per variant or 4 weeks, whichever comes first; decide from the numbers only then. 600 is enough to see a large difference (say 5% vs 2%); 5% vs 3% would need about 1,500 and 3% vs 2% about 3,800, so a close race ends in "no clear winner" and the survey and interviews decide.
-4. **Separately**, if you want to test a variant on "its own" audience (for example, A in AI communities), use `?v=a`. Look at that data through the "Forced" filter and don't mix it into the A/B.
+1. **For the A/B test, link to the site root without `?v=`**, tagged per source (`/?utm_source=reddit&utm_campaign=r-devops`). Only then is every source split evenly between the variants.
+2. **Keep post and ad texts neutral.** A text that pitches one positioning sends most of its readers to a page about another.
+3. **Read the result only at the finish line.** 600 visitors per variant is enough to see a large difference (say 5% vs 2%); 5% vs 3% would need about 1,500 and 3% vs 2% about 3,800, so a close race ends in "no clear winner" and the survey and interviews decide.
+4. **Test a variant on "its own" audience separately**, with `?v=a` links. Look at that data through the "Forced" filter and don't mix it into the A/B.
 5. **Look beyond conversion.** Who signs up (roles, team size) and what they write in "how do you handle this today" is material for interviews. Reach out to the first 10–20 signups.
 
 ## Changing the name or the copy

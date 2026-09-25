@@ -73,7 +73,7 @@ These bring few visitors but the best interviews. Ask everyone who answers for a
 
 ## Search test (forced variants)
 
-A separate, small test (~$100–150 on Google Search): each keyword group gets the variant that matches it. It measures how well each niche converts people who are already looking for it — often a stronger signal than the A/B test. On `/stats` it shows under the **Forced** filter and never mixes into the A/B numbers.
+A separate, small test (~$100–150 on Google Search): each keyword group gets the variant that matches it. It measures how well each positioning converts its own audience when they are already looking for it — often a stronger signal than the A/B test. On `/stats` it shows under the **Forced** filter and never mixes into the A/B numbers.
 
 | Keyword group | Examples | Link |
 |---|---|---|

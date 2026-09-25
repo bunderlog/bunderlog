@@ -1,6 +1,6 @@
 # bunderlog
 
-A positioning-experiment landing page: one page, three Variants (A/B/C) each carrying one Positioning, a waitlist and a token-protected `/stats` page that compares Signup conversion per Variant. The product itself is not built yet — this repo only answers "which positioning makes people sign up". Domain terms: `.about/glossary.md`.
+A positioning-experiment landing page: one page, three Variants (A/B/C) each carrying one Positioning, a waitlist and a token-protected `/stats` page that compares Conversion per Variant. The product itself is not built yet — this repo only answers "which positioning makes people sign up". Domain terms: `.about/glossary.md`.
 
 ## Layout
 
@@ -32,7 +32,7 @@ After changing `worker/`, run `npm test`; after any change, run `npm run build`.
 - `?notrack` makes a browser Internal: no events, Signups stored with `test = 1` and excluded from stats.
 - Conversion = Signups ÷ Visitors, where a Visitor is a distinct `visitor` id with a `view` event and a Signup counts only if its Visitor was seen. If you add an event type, keep that definition.
 - The Finish line (600 Visitors per Variant or 4 weeks) is fixed; don't move it or let `/stats` call a winner earlier.
-- Changing copy mid-test starts a new Period — mention the `Since` filter to the user.
+- Changing copy mid-test starts a new Period and restarts the Finish line — mention the `Since` filter to the user.
 
 ## Conventions
 
