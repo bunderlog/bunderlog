@@ -51,7 +51,7 @@ npm run build                      # typecheck + build to dist/
 
 Pages and assets are served by Cloudflare directly and are free and unlimited. Only `/api/*` and `/healthz` run the Worker, which the free plan allows 100,000 times a day (each visitor makes 2–4 API calls). D1's free plan allows 5M rows read and 100k rows written a day; past a limit, the API fails until the next day. Each `/stats` load reads every event a few times, so it's the heaviest query.
 
-It is deployed at https://bunderlog.andrew-molyuk.workers.dev, with the D1 database `bunderlog` (its id is in `wrangler.jsonc`). To serve it on your domain, add the domain to Cloudflare (free plan) and attach it to the Worker: Workers & Pages → bunderlog → Settings → Domains & Routes.
+It is live at https://bunderlog.com (and `www.`), with the D1 database `bunderlog`. Both are set in `wrangler.jsonc`: the domains as the Worker's custom domains, the database by id.
 
 `npm run deploy` ships a new version. A new migration in `migrations/` goes out with `npx wrangler d1 migrations apply bunderlog --remote` before the deploy. Logs: `npx wrangler tail` or the Worker's Observability tab. A backup: `npx wrangler d1 export bunderlog --remote --output backup.sql`. A new stats token: `openssl rand -hex 24 | npx wrangler secret put STATS_TOKEN`.
 

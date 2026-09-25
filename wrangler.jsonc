@@ -22,6 +22,10 @@
     { "name": "EVENT_LIMIT", "namespace_id": "1001", "simple": { "limit": 120, "period": 60 } },
     { "name": "JOIN_LIMIT", "namespace_id": "1002", "simple": { "limit": 6, "period": 60 } }
   ],
+  "routes": [
+    { "pattern": "bunderlog.com", "custom_domain": true },
+    { "pattern": "www.bunderlog.com", "custom_domain": true }
+  ],
   "secrets": { "required": ["STATS_TOKEN"] },
   "observability": { "enabled": true }
 }
