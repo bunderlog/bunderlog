@@ -47,8 +47,8 @@ export interface Experiment {
 function randomVariant(): Variant {
   const mask = 2 ** Math.ceil(Math.log2(VARIANTS.length)) - 1
   for (;;) {
-    const x = crypto.getRandomValues(new Uint32Array(1))[0] & mask
-    if (x < VARIANTS.length) return VARIANTS[x]
+    const v = VARIANTS.at(crypto.getRandomValues(new Uint32Array(1))[0] & mask)
+    if (v) return v
   }
 }
 

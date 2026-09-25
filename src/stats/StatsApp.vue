@@ -91,7 +91,7 @@ const rows = computed(() => {
     label: LABELS.get(v.variant) ?? v.variant,
     ci: wilson(v.signups, v.visitors),
     engagedRate: v.visitors ? v.engaged / v.visitors : 0,
-    pBest: best[i],
+    pBest: best.at(i) ?? 0,
   }))
 })
 
