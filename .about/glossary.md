@@ -38,8 +38,12 @@ A Visitor who focused the email field or clicked a call to action, whether or no
 _In code_: the `engage` event
 
 **Conversion**:
-Signups divided by Visitors for one Variant, counting neither Internal Signups nor the other Assignment.
+Signups divided by Visitors for one Variant, counting neither Internal Signups nor the other Assignment. A Signup counts only when its Visitor was seen (sent a `view`) under the same filter; the rest are listed as unseen.
 _Avoid_: signup rate
+
+**Finish line**:
+The point, fixed before the test starts, at which the result is read: 600 Visitors per Variant or 4 weeks, whichever comes first. Numbers read earlier are progress, not a result.
+_Avoid_: stopping point, deadline
 
 **Period**:
 The part of the experiment from a chosen date on; changing a Variant's copy starts a new one, and only numbers within one Period compare.
@@ -61,7 +65,3 @@ _In code_: `Profile`, `/api/profile`, `profiles`
 The Survey answer, in the person's own words, on how they handle the problem today; the question is worded per Variant.
 _Avoid_: pain
 _In code_: `pain`, `painQuestion`
-
-## Unresolved
-
-- **Signup without a Visitor** — a Signup counts toward Conversion even when its browser never sent a `view` (blocked beacon, broken script), so Conversion can overstate and, on small samples, exceed 100%. Settled by: deciding whether such a Signup still counts, or counts only when its Visitor was seen.

@@ -17,7 +17,7 @@ async function post(path: string, body: string, ua = BROWSER_UA) {
 async function getStats(query = '') {
   const res = await call(`/api/stats?${query}`, { headers: { authorization: 'Bearer secret' } })
   expect(res.status).toBe(200)
-  const s = (await res.json()) as { variants: { variant: string }[]; notes: { pain: string }[] }
+  const s = (await res.json()) as { variants: { variant: string }[]; notes: { pain: string }[]; sources: unknown[]; unseenSignups: number }
   return { ...s, variant: (v: string) => s.variants.find((x) => x.variant === v) }
 }
 
@@ -44,7 +44,7 @@ it('counts visitors, signups and survey answers per variant, leaving out forced,
   // Honeypot and internal test signups must not count.
   expect((await post('/api/waitlist', '{"email":"bot@spam.com","variant":"a","website":"http://spam"}')).body).toEqual({ ok: true })
   await post('/api/waitlist', '{"email":"me@team.com","variant":"a","test":true}')
-  await post('/api/waitlist', '{"email":"ad@click.com","variant":"c","forced":true,"source":"ads"}')
+  await post('/api/waitlist', '{"email":"ad@click.com","variant":"c","visitor":"v4","forced":true,"source":"ads"}')
 
   expect((await post('/api/profile', `{"token":"${token}","role":"AI / ML engineer","teamSize":"2–10","pain":"grep"}`)).status).toBe(200)
   expect((await post('/api/profile', '{"token":"nope","role":"x"}')).status).toBe(404)
@@ -60,6 +60,19 @@ it('counts visitors, signups and survey answers per variant, leaving out forced,
   // Bots are ignored silently.
   expect((await post('/api/event', '{"type":"view","variant":"b","visitor":"bot"}', 'Googlebot/2.1')).status).toBe(204)
   expect((await getStats()).variant('b')).toMatchObject({ visitors: 1 })
+})
+
+it('counts a signup toward conversion only when its visitor was seen', async () => {
+  await post('/api/event', '{"type":"view","variant":"a","visitor":"seen","source":"hn"}')
+  await post('/api/waitlist', '{"email":"seen@example.com","variant":"a","visitor":"seen","source":"hn"}')
+  // Blocked beacon: the signup arrives, the view never did.
+  await post('/api/waitlist', '{"email":"unseen@example.com","variant":"a","visitor":"ghost","source":"hn"}')
+  await post('/api/waitlist', '{"email":"novisitor@example.com","variant":"a","source":"hn"}')
+
+  const s = await getStats()
+  expect(s.variant('a')).toMatchObject({ visitors: 1, signups: 1 })
+  expect(s.unseenSignups).toBe(2)
+  expect(s.sources).toEqual([{ source: 'hn', variant: 'a', visitors: 1, signups: 1 }])
 })
 
 it('rejects events with an unknown type or variant', async () => {

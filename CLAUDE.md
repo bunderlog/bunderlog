@@ -30,7 +30,8 @@ After changing `worker/`, run `npm test`; after any change, run `npm run build`.
 - Variants differ only in **copy**, never in layout or form — otherwise the test measures design, not positioning. New copy goes into `copy.ts`; components stay variant-agnostic.
 - A Visitor keeps their first Variant (`localStorage`). `?v=` assigns only new Visitors (Forced) and switches only Internal browsers; Forced traffic is excluded from the default A/B view. Don't change assignment or counting in a way that mixes the two.
 - `?notrack` makes a browser Internal: no events, Signups stored with `test = 1` and excluded from stats.
-- Conversion = Signups ÷ Visitors, where a Visitor is a distinct `visitor` id with a `view` event. If you add an event type, keep that definition.
+- Conversion = Signups ÷ Visitors, where a Visitor is a distinct `visitor` id with a `view` event and a Signup counts only if its Visitor was seen. If you add an event type, keep that definition.
+- The Finish line (600 Visitors per Variant or 4 weeks) is fixed; don't move it or let `/stats` call a winner earlier.
 - Changing copy mid-test starts a new Period — mention the `Since` filter to the user.
 
 ## Conventions

@@ -18,9 +18,12 @@ interface Stats {
   teamSizes: { variant: Variant; value: string; n: number }[] | null
   notes: { ts: string; variant: Variant; source: string; role: string; teamSize: string; pain: string }[] | null
   allSources: string[] | null
+  unseenSignups: number
 }
 
-const MIN_VISITORS = 100 // per variant before we call a winner
+// The finish line, fixed before the test starts: 600 visitors per variant or 4 weeks, whichever comes first.
+// Reading a winner off earlier numbers is how peeking produces false winners.
+const TARGET_VISITORS = 600
 
 const token = ref(storage.get('bl_stats_token') || '')
 const tokenInput = ref('')
@@ -108,18 +111,24 @@ const verdict = computed(() => {
   const minVisitors = Math.min(...r.map((x) => x.visitors))
   const sorted = [...r].sort((a, b) => b.ci.p - a.ci.p)
   const leader = [...r].sort((a, b) => b.pBest - a.pBest)[0]
-  if (minVisitors < 30) {
-    return { tone: 'wait', text: `Collecting data — every variant needs at least ${MIN_VISITORS} visitors before the numbers mean much.` }
+  const lead = `${letter(leader.variant)} · ${leader.label} leads with ${pct(leader.pBest, 0)} probability of being best`
+  if (minVisitors < TARGET_VISITORS) {
+    const sofar = minVisitors >= 30 ? ` For now, ${lead}.` : ''
+    return {
+      tone: 'wait',
+      text: `Collecting data — ${minVisitors} of ${TARGET_VISITORS} visitors per variant (or stop at 4 weeks). Don’t pick a winner before the finish line.${sofar}`,
+    }
   }
-  if (leader.pBest >= 0.95 && minVisitors >= MIN_VISITORS) {
-    return { tone: 'win', text: `${letter(leader.variant)} · ${leader.label} is ahead with ${pct(leader.pBest, 0)} probability of being best.` }
-  }
+  if (leader.pBest >= 0.95) return { tone: 'win', text: `Finish line reached: ${lead}.` }
   const [first, second] = sorted
   const need = sampleSizePerArm(first.ci.p, second.ci.p)
   const needText = Number.isFinite(need)
-    ? ` At the current rates, about ${need.toLocaleString()} visitors per variant are needed to separate ${letter(first.variant)} from ${letter(second.variant)}.`
+    ? ` Separating ${letter(first.variant)} from ${letter(second.variant)} at these rates would take about ${need.toLocaleString()} visitors per variant.`
     : ''
-  return { tone: 'wait', text: `No clear winner yet — ${letter(leader.variant)} leads with ${pct(leader.pBest, 0)} probability of being best.${needText}` }
+  return {
+    tone: 'wait',
+    text: `Finish line reached without a clear winner: ${lead}.${needText} Decide with the survey answers and interviews.`,
+  }
 })
 
 const sourceRows = computed(() => {
@@ -268,6 +277,10 @@ onMounted(load)
           <p class="sub foot">
             <b>Engaged</b> = focused the email field or clicked a CTA. High engagement with low signups points to friction in the
             form rather than weak positioning.
+          </p>
+          <p v-if="data.unseenSignups" class="sub foot">
+            {{ data.unseenSignups }} signup{{ data.unseenSignups === 1 ? '' : 's' }} not counted: the visitor never sent a view (for example, a
+            blocked script). Still on the waitlist and in the CSV.
           </p>
         </section>
 

@@ -56,6 +56,8 @@ export interface Stats {
   teamSizes: Count[]
   notes: { ts: string; variant: string; source: string; role: string; teamSize: string; pain: string }[]
   allSources: string[]
+  /** Signups left out of Conversion because their Visitor never sent a `view` (e.g. a blocked beacon). */
+  unseenSignups: number
 }
 
 interface Count {
@@ -117,18 +119,22 @@ function where(f: Filter): [string, unknown[]] {
 export async function stats(db: D1Database, f: Filter): Promise<Stats> {
   const [w, args] = where(f)
   const q = (sql: string) => db.prepare(sql).bind(...args)
+  // A Signup counts toward Conversion only if its Visitor was seen under the same filter,
+  // so every counted Signup is also among the Visitors it is divided by.
+  const seen = `visitor IN (SELECT visitor FROM events WHERE type = 'view' AND ${w})`
+  const qSeen = (sql: string) => db.prepare(sql).bind(...args, ...args)
   // One round trip; each result is read by position below.
-  const [funnel, signups, profiles, srcViews, srcSignups, roles, teamSizes, notes, allSources] = await db.batch([
+  const [funnel, signups, profiles, srcViews, srcSignups, roles, teamSizes, notes, allSources, unseen] = await db.batch([
     // Visitors are distinct per variant; a visitor keeps one variant and one first-touch source.
     q(`SELECT variant,
          COUNT(DISTINCT CASE WHEN type = 'view' THEN visitor END) AS visitors,
          COUNT(DISTINCT CASE WHEN type = 'engage' THEN visitor END) AS engaged
        FROM events WHERE ${w} GROUP BY variant`),
-    q(`SELECT variant, COUNT(*) AS n FROM waitlist WHERE test = 0 AND ${w} GROUP BY variant`),
-    q(`SELECT variant, COUNT(*) AS n FROM waitlist
-       WHERE test = 0 AND (role IS NOT NULL OR team_size IS NOT NULL OR pain IS NOT NULL) AND ${w} GROUP BY variant`),
+    qSeen(`SELECT variant, COUNT(*) AS n FROM waitlist WHERE test = 0 AND ${w} AND ${seen} GROUP BY variant`),
+    qSeen(`SELECT variant, COUNT(*) AS n FROM waitlist
+       WHERE test = 0 AND (role IS NOT NULL OR team_size IS NOT NULL OR pain IS NOT NULL) AND ${w} AND ${seen} GROUP BY variant`),
     q(`SELECT source, variant, COUNT(DISTINCT visitor) AS n FROM events WHERE type = 'view' AND ${w} GROUP BY source, variant`),
-    q(`SELECT source, variant, COUNT(*) AS n FROM waitlist WHERE test = 0 AND ${w} GROUP BY source, variant`),
+    qSeen(`SELECT source, variant, COUNT(*) AS n FROM waitlist WHERE test = 0 AND ${w} AND ${seen} GROUP BY source, variant`),
     q(`SELECT variant, role AS value, COUNT(*) AS n FROM waitlist
        WHERE test = 0 AND role IS NOT NULL AND ${w} GROUP BY variant, role ORDER BY 3 DESC`),
     q(`SELECT variant, team_size AS value, COUNT(*) AS n FROM waitlist
@@ -136,6 +142,7 @@ export async function stats(db: D1Database, f: Filter): Promise<Stats> {
     q(`SELECT ts, variant, source, COALESCE(role, '') AS role, COALESCE(team_size, '') AS teamSize, pain
        FROM waitlist WHERE test = 0 AND pain IS NOT NULL AND ${w} ORDER BY ts DESC LIMIT 200`),
     db.prepare('SELECT source FROM events UNION SELECT source FROM waitlist ORDER BY 1'),
+    qSeen(`SELECT COUNT(*) AS n FROM waitlist WHERE test = 0 AND ${w} AND NOT (visitor IS NOT NULL AND ${seen})`),
   ])
 
   const byVariant = new Map(VARIANTS.map((v): [string, VariantStats] => [v, { variant: v, visitors: 0, engaged: 0, signups: 0, profiles: 0 }]))
@@ -172,6 +179,7 @@ export async function stats(db: D1Database, f: Filter): Promise<Stats> {
     teamSizes: teamSizes.results as Count[],
     notes: notes.results as Stats['notes'],
     allSources: (allSources.results as { source: string }[]).map((r) => r.source),
+    unseenSignups: (unseen.results as { n: number }[])[0].n,
   }
 }
 
